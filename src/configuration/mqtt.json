@@ -1,0 +1,17 @@
+{
+  "type" : "HiveMq",
+  "server": "your_mqtt_server",
+  "port": 1883,
+  "clientId": "your_client_id",
+  "ssl": true,
+  "authentication":
+  {
+    "type": "user&password",
+    "data":
+    {
+      "user": "your_mqtt_user",
+      "password": "your_mqtt_password"
+    }
+  },
+  "keepAlive": 60
+}
