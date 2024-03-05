@@ -15,6 +15,7 @@ class WiFi(Connection):
         return self._wlan.isconnected()
 
     def connect(self):
+        self.logger.log_info(f"Connecting to ssid {self.config.ssid}.")
         self._wlan.active(True)
         self.logger.log_debug(f"Ssid: {self.config.ssid}, Password: {self.config.password}")
         self._wlan.connect(self.config.ssid, self.config.password)
