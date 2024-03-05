@@ -31,3 +31,4 @@ class Connection:
 
     def connect(self):
         self.logger.log_debug("Fake. Connecting to wifi...")
+        return True

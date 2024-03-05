@@ -22,12 +22,13 @@ if __name__ == '__main__':
     logger = Logger(LoggerLevels.DEBUG)
 
     connection = ConnectionBuilder(logger).build()
-    connection.connect()
-    if not connection.is_connected():
+    connection_result =  connection.connect()
+    if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
     mqtt = MqttBuilder(logger).build()
     mqtt_connection_result = mqtt.connect()
+
     if not mqtt_connection_result:
         setup_fail(logger, f"Failed to connect with {mqtt.config.type}.", 2)
 
