@@ -10,7 +10,7 @@
     "type": "user&password",
     "data":
     {
-      "user": "your_mqtt_user",
+      "username": "your_mqtt_user",
       "password": "your_mqtt_password"
     }
   },

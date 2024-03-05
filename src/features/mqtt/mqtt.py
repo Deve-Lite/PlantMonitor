@@ -17,10 +17,10 @@ class MqttConfiguration(Configuration):
         super().__init__(json)
         self.type = self.value_in_list("type", MqttTypes.get_types())
         self.server = json.get("server")
-        self.port = self.value_in_range("port", 0, 65536)
+        self.port = self.value_in_range(name="port", min_v=0, max_v=65536)
         self.client = json.get("client")
-        self.ssl = json.get("sll", True)
-        self.keep_alive = self.value_in_range("keep_alive", 10, 60)
+        self.ssl = json.get("ssl", True)
+        self.keep_alive = self.value_in_range(name="keepAlive", min_v=10, max_v=120)
 
 
 class BaseMqttClient:

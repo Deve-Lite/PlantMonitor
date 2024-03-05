@@ -8,10 +8,10 @@ class HiveMqClient(BaseMqttClient):
         self._base_topic = mqtt_config.json.get("typeSpecificData", {}).get("baseTopic", "")
         self._callbacks = {}
 
-        authentication_data = mqtt_config.json.get("authentication")
-        username = authentication_data.json.get("data", {}).get("username", "")
-        password = authentication_data.json.get("data", {}).get("password", "")
-
+        authentication_data = self.config.json.get("authentication")
+        username = authentication_data.get("data", {}).get("username", "")
+        password = authentication_data.get("data", {}).get("password", "")
+        self.logger.log_debug(f"Connecting to server with: {username} {password}")
         self._client = MQTTClient(
             client_id=self.config.client,
             server=self.config.server,
