@@ -15,31 +15,29 @@ class WiFi(Connection):
         return self._wlan.isconnected()
 
     def connect(self):
-        self._wlan.active(True)
+        self.logger.log_info(f"Connecting to ssid {self.config.ssid}.")
         self.logger.log_debug(f"Ssid: {self.config.ssid}, Password: {self.config.password}")
+
+        self._wlan.active(True)
         self._wlan.connect(self.config.ssid, self.config.password)
 
         sleep(1)
         i = 0
-
         while not self._wlan.isconnected() and i < 15:
             status = self._wlan.status()
-            message = f"Not Connected. Status: {status}, means {self.get_status_description(status)}"
-            self.logger.log_warning(message)
+            self.logger.log_warning(f"""Not Connected. Status: {status},
+             means {self.get_status_description(status)}""")
             i += 1
             sleep(1)
 
         status = self._wlan.status()
+        status_description = self.get_status_description(status)
 
         if not self._wlan.isconnected():
-            status_description = self.get_status_description(status)
-            message = f"Not Connected. Status: {status}, means {status_description}."
-            self.logger.log_warning(message)
+            self.logger.log_warning(f"Not Connected. Status: {status}, means {status_description}.")
             return False
 
-        status_description = self.get_status_description(status)
-        message = f"Connected. Status: {status}, means {status_description}."
-        self.logger.log_info(message)
+        self.logger.log_info(f"Connected. Status: {status}, means {status_description}.")
         return True
 
     @staticmethod

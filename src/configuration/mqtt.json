@@ -1,17 +1,21 @@
 {
-  "type" : "HiveMq",
+  "type" : "hivemq/none",
   "server": "your_mqtt_server",
-  "port": 1883,
-  "clientId": "your_client_id",
+  "port": 8883,
+  "client": "your_client_id",
   "ssl": true,
+  "keepAlive": 60,
   "authentication":
   {
     "type": "user&password",
     "data":
     {
-      "user": "your_mqtt_user",
+      "username": "your_mqtt_user",
       "password": "your_mqtt_password"
     }
   },
-  "keepAlive": 60
+  "typeSpecificData":
+  {
+    "baseTopic": "plantMonitor/"
+  }
 }

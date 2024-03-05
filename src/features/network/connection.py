@@ -8,7 +8,7 @@ class ConnectionConfiguration(Configuration):
         self.type = self.value_in_list("type", ConnectionTypes.get_types())
         self.ssid = json.get("ssid")
         self.password = json.get("password")
-        self.max_connection_tries = self.value_in_range(name="maxConnectionTime")
+        self.max_connection_tries = self.value_in_range(name="maxConnectionTime", min_v=5, max_v=60)
 
 
 class ConnectionTypes:
@@ -31,3 +31,4 @@ class Connection:
 
     def connect(self):
         self.logger.log_debug("Fake. Connecting to wifi...")
+        return True
