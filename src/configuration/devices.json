@@ -1,3 +1,51 @@
-{
-
-}
+[
+    {
+        "ground_pin": 38,
+        "vcc_pin": 36,
+        "type": "TemperatureAndHumidity",
+        "name": "dht11",
+        "data":
+        {
+            "pin": 1,
+            "temperature":
+            {
+                "unit": "Celsius",
+                "topic": "dht11/temperature",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
+                    "value": 0.2,
+                    "minimalIntervalSeconds": 20
+                }
+            },
+            "humudity":
+            {
+                "unit": "Percentage",
+                "topic": "dht11/humidity",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
+                    "value": 1,
+                    "minimalIntervalSeconds": 20
+                }
+            }
+        }
+    },
+    {
+        "ground_pin": 38,
+        "vcc_pin": 36,
+        "type": "SoilMoisture",
+        "name": "gravity-csmsv1",
+        "data":
+        {
+            "pin": 26,
+            "topic": "soilMoisture/1",
+            "sendAsJson": true,
+            "threshold":{
+                "type": "value",
+                "value": 1,
+                "minimalIntervalSeconds": 20
+            }
+        }
+    }
+]
