@@ -1,9 +1,14 @@
 [
     {
-        "ground_pin": 38,
-        "vcc_pin": 36,
+        "id": "dht11-one",
+        "ground": 38,
+        "vcc": 36,
         "type": "TemperatureAndHumidity",
         "name": "dht11",
+        "availability": {
+            "enabled": true,
+            "topic": "dht11/availability"
+        },
         "data":
         {
             "pin": 1,
@@ -18,7 +23,7 @@
                     "minimalIntervalSeconds": 20
                 }
             },
-            "humudity":
+            "humidity":
             {
                 "unit": "Percentage",
                 "topic": "dht11/humidity",
@@ -28,23 +33,6 @@
                     "value": 1,
                     "minimalIntervalSeconds": 20
                 }
-            }
-        }
-    },
-    {
-        "ground_pin": 38,
-        "vcc_pin": 36,
-        "type": "SoilMoisture",
-        "name": "gravity-csmsv1",
-        "data":
-        {
-            "pin": 26,
-            "topic": "soilMoisture/1",
-            "sendAsJson": true,
-            "threshold":{
-                "type": "value",
-                "value": 1,
-                "minimalIntervalSeconds": 20
             }
         }
     }

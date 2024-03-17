@@ -4,8 +4,8 @@ import gc
 from application import App
 from features.logger.logger import Logger
 from features.logger.logger_levels import LoggerLevels
-from features.mqtt.mqtt_builder import MqttBuilder
-from features.network.connection_builder import ConnectionBuilder
+from features.mqtt.mqtt_factory import MqttFactory
+from features.network.connection_factory import ConnectionFactory
 
 from utime import sleep
 from machine import reset
@@ -21,12 +21,12 @@ if __name__ == '__main__':
 
     logger = Logger(LoggerLevels.DEBUG)
 
-    connection = ConnectionBuilder(logger).build()
+    connection = ConnectionFactory(logger).create()
     connection_result =  connection.connect()
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
-    mqtt = MqttBuilder(logger).build()
+    mqtt = MqttFactory(logger).create()
     mqtt_connection_result = mqtt.connect()
 
     if not mqtt_connection_result:

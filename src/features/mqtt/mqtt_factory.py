@@ -1,14 +1,14 @@
-from abstractions.builder import Builder
+from abstractions.factory import Factory
 from features.logger.logger import Logger
 from features.mqtt.hive_mq import HiveMqClient
 from features.mqtt.mqtt import MqttConfiguration, MqttTypes, BaseMqttClient
 
 
-class MqttBuilder(Builder):
+class MqttFactory(Factory):
     def __init__(self, logger: Logger = None):
         super().__init__("mqtt", logger)
 
-    def build(self):
+    def create(self):
         config = MqttConfiguration(self.config)
 
         if config.type == MqttTypes.HiveMq:

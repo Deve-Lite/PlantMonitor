@@ -1,7 +1,6 @@
 from abstractions.configuration import Configuration
 from features.logger.logger import Logger
 
-from ujson import loads
 
 class MqttTypes:
     Fake = "none"
