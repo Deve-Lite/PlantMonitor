@@ -1,13 +1,13 @@
 [
     {
-        "id": "dht11-one",
+        "id": "1",
         "ground": 38,
         "vcc": 36,
-        "type": "TemperatureAndHumidity",
+        "type": "air",
         "name": "dht11",
         "availability": {
             "enabled": true,
-            "topic": "dht11/availability"
+            "topic": "availability"
         },
         "data":
         {
@@ -15,7 +15,7 @@
             "temperature":
             {
                 "unit": "Celsius",
-                "topic": "dht11/temperature",
+                "topic": "temperature",
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
@@ -26,7 +26,7 @@
             "humidity":
             {
                 "unit": "Percentage",
-                "topic": "dht11/humidity",
+                "topic": "humidity",
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",

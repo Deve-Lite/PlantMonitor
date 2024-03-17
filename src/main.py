@@ -22,7 +22,7 @@ if __name__ == '__main__':
     logger = Logger(LoggerLevels.DEBUG)
 
     connection = ConnectionFactory(logger).create()
-    connection_result =  connection.connect()
+    connection_result = connection.connect()
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
@@ -33,4 +33,6 @@ if __name__ == '__main__':
         setup_fail(logger, f"Failed to connect with {mqtt.config.type}.", 2)
 
     app = App(logger)
+    # topic configurations: {base_mqtt_topic}/{device_type}/{device_name}/{device_id}/{topic}
+    #                           (optional)     (required)    (required)   (required)  (required)
     app.start()
