@@ -6,7 +6,7 @@ import uasyncio
 
 
 class Topic:
-    def __init__(self, mqtt : BaseMqttClient, config):
+    def __init__(self, mqtt: BaseMqttClient, config):
         self.mqtt = mqtt
         self.config = config
         self.unit = config["unit"]
@@ -71,16 +71,15 @@ class DeviceConfig:
 class Device:
     def __init__(self, mqtt_client: BaseMqttClient, config: DeviceConfig, logger: Logger):
         self.config = config
-        self.client = mqtt_client
+        self.mqtt = mqtt_client
         self.logger = logger
-
-    def topic(self):
-        return f"{self.config.type}/{self.config.name}/{self.config.id}/"
+        self.base_topic = f"{self.config.type}/{self.config.name}/{self.config.id}/"
 
     async def _loop(self):
         raise NotImplementedError("Method not implemented")
 
     async def _update_config(self):
+        # For reading states of other devices
         raise NotImplementedError("Method not implemented")
 
     async def loop(self):

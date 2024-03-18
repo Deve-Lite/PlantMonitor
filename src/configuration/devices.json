@@ -16,6 +16,7 @@
             {
                 "unit": "Celsius",
                 "topic": "temperature",
+                "unitTopic": "unit",
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",

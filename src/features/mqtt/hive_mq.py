@@ -2,6 +2,7 @@ from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient, MqttConfiguration
 from umqtt.simple import MQTTClient
 
+
 class HiveMqClient(BaseMqttClient):
     def __init__(self, mqtt_config: MqttConfiguration, logger: Logger):
         super().__init__(mqtt_config, logger)
