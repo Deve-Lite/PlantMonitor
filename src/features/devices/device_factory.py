@@ -11,7 +11,7 @@ class DeviceFactory(Factory):
 
     def create(self, config: DeviceConfig):
 
-        if config.type == "TemperatureAndHumidity":
+        if config.type == "air":
             if config.name == "dht11":
                 return DHT11(self.client, config, self.logger)
             raise NotImplementedError("Air device is not supported")

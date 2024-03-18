@@ -1,7 +1,7 @@
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient
 from utime import ticks_ms, ticks_diff
-from ujson import dumps
+from ujson import dumps, loads
 import uasyncio
 
 
@@ -73,7 +73,31 @@ class Device:
         self.config = config
         self.mqtt = mqtt_client
         self.logger = logger
-        self.base_topic = f"{self.config.type}/{self.config.name}/{self.config.id}/"
+        self.base_topic = f"{self.config.type}/{self.config.name}/{self.config.id}"
+        availability_topic = f"{self.base_topic}/{self.config.availability.topic}"
+        self.mqtt.subscribe(availability_topic, self._availability_switch)
+
+    def _availability_switch(self, payload: str):
+        if payload is ["on", "1"]:
+            self.config.availability.enabled = True
+
+        if payload is ["off", "0"]:
+            self.config.availability.enabled = False
+
+        if "value" not in payload:
+            return
+
+        data = loads(payload)
+        value = data.get("value", None)
+
+        if value is None:
+            return
+
+        if value is ["on", "1"]:
+            self.config.availability.enabled = True
+
+        if value is ["off", "0"]:
+            self.config.availability.enabled = False
 
     async def _loop(self):
         raise NotImplementedError("Method not implemented")

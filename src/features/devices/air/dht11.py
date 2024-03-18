@@ -74,7 +74,7 @@ class DHT11(Device):
                  config: DeviceConfig,
                  logger: Logger):
         super().__init__(mqtt, config, logger)
-        data = config.config["data"]
+        data = config.config
 
         self.data_pin = data["pin"]
         self._temperature = Temperature(mqtt, data["temperature"], logger)

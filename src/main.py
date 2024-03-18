@@ -13,6 +13,7 @@ from utime import sleep
 from machine import reset
 from ujson import loads
 
+
 def setup_fail(logger: Logger, message: str, error_code: int):
     logger.log_error(message)
     sys.exit(error_code)
