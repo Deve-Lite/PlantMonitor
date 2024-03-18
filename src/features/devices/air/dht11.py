@@ -104,5 +104,4 @@ class DHT11(Device):
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
-        self.logger\
-            .log_debug(f"Measured temperature: {self._sensor.temperature()} and humidity: {self._sensor.humidity()}.")
+        self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
