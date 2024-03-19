@@ -1,5 +1,6 @@
 import sys
 import gc
+import uasyncio
 
 from application import App
 from features.devices.device import DeviceConfig
@@ -29,9 +30,6 @@ if __name__ == '__main__':
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
-    # topic configurations: {base_mqtt_topic}/{device_type}/{device_name}/{device_id}/{topic}
-    #                           (optional)     (required)    (required)   (required)  (required)
-
     mqtt = MqttFactory(logger).create()
     mqtt_connection_result = mqtt.connect()
 
@@ -55,5 +53,5 @@ if __name__ == '__main__':
         device = device_factory.create(config)
         devices.append(device)
 
-    app = App(logger)
-    app.start()
+    app = App(devices, logger)
+    uasyncio.run(app.start())

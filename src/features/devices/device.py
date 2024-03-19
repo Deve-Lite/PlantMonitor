@@ -4,6 +4,8 @@ from utime import ticks_ms, ticks_diff
 from ujson import dumps, loads
 import uasyncio
 
+MILISECONDS = 1000
+
 
 class Topic:
     def __init__(self, mqtt: BaseMqttClient, config):
@@ -18,14 +20,14 @@ class Topic:
         self.value = config["value"]
         self.minimalIntervalSeconds = config["minimalIntervalSeconds"]
 
-        self._value = None
-        self._last_update = ticks_ms()
+        self._value = 0
+        self._last_update = ticks_ms() - self.minimalIntervalSeconds * MILISECONDS
 
     def update(self, base_topic: str, current_time, current_value):
-        if abs(ticks_diff(current_time, self._last_update)) < self.minimalIntervalSeconds:
+        if abs(ticks_diff(current_time, self._last_update)) < self.minimalIntervalSeconds * MILISECONDS:
             return False
 
-        if abs(current_value - self.value) == 0:
+        if abs(current_value - self._value) == 0:
             return False
 
         self._last_update = current_time
@@ -78,10 +80,10 @@ class Device:
         self.mqtt.subscribe(availability_topic, self._availability_switch)
 
     def _availability_switch(self, payload: str):
-        if payload is ["on", "1"]:
+        if payload in ["on", "1"]:
             self.config.availability.enabled = True
 
-        if payload is ["off", "0"]:
+        if payload in ["off", "0"]:
             self.config.availability.enabled = False
 
         if "value" not in payload:
@@ -93,10 +95,10 @@ class Device:
         if value is None:
             return
 
-        if value is ["on", "1"]:
+        if value in ["on", "1"]:
             self.config.availability.enabled = True
 
-        if value is ["off", "0"]:
+        if value in ["off", "0"]:
             self.config.availability.enabled = False
 
     async def _loop(self):

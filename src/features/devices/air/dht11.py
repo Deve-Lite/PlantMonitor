@@ -13,7 +13,6 @@ class Humidity(Topic):
 
 
 class Temperature(Topic):
-
     AVAILABLE_UNITS = ["C", "F", "K",
                        "Celsius", "Fahrenheit", "Kelvin"]
 
@@ -34,7 +33,7 @@ class Temperature(Topic):
         self.logger.log_info(f"Unit changed to {new_unit}")
 
     def format_data(self):
-        value = self._convert_unit(self.value)
+        value = self._convert_unit(self._value)
 
         if not self.sendAsJson:
             return value
@@ -48,10 +47,10 @@ class Temperature(Topic):
         return dumps(json)
 
     def _convert_unit(self, value):
-        if self.unit == "F" or "Fahrenheit":
+        if self.unit in ["F", "Fahrenheit"]:
             return self.celsius_to_fahrenheit(value)
 
-        if self.unit == "K" or "Kelvin":
+        if self.unit in ["K", "Kelvin"]:
             return self.celsius_to_kelvin(value)
 
         return value
@@ -59,12 +58,12 @@ class Temperature(Topic):
     @staticmethod
     def celsius_to_fahrenheit(celsius):
         fahrenheit = (celsius * 9 / 5) + 32
-        return fahrenheit
+        return int(fahrenheit)
 
     @staticmethod
     def celsius_to_kelvin(celsius):
         kelvin = celsius + 273.15
-        return kelvin
+        return int(kelvin)
 
 
 class DHT11(Device):
@@ -83,9 +82,9 @@ class DHT11(Device):
         dht_pin = machine.Pin(self.data_pin, machine.Pin.IN, machine.Pin.PULL_UP)
         self._sensor = dht.DHT11(dht_pin)
 
-        self._last_read = ticks_ms()
+        self._last_read = ticks_ms() - self.DHT_READ_SPAN
 
-        unit_topic = f"{self.base_topic}/{self._temperature.unit_topic}"
+        unit_topic = f"{self.base_topic}/{self._temperature.topic}/{self._temperature.unit_topic}"
         self.mqtt.subscribe(unit_topic, self._temperature.update_unit)
 
     async def _update_config(self):
@@ -93,6 +92,7 @@ class DHT11(Device):
 
     async def _loop(self):
         current_time = ticks_ms()
+
         if abs(ticks_diff(current_time, self._last_read)) < DHT11.DHT_READ_SPAN:
             uasyncio.sleep_ms(200)
             return
@@ -105,3 +105,4 @@ class DHT11(Device):
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
         self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+

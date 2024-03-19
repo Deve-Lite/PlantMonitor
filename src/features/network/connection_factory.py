@@ -6,7 +6,7 @@ from features.network.wifi import WiFi
 
 class ConnectionFactory(Factory):
     def __init__(self, logger: Logger = None):
-        super().__init__("connections", logger)
+        super().__init__("connection", logger)
 
     def create(self):
         config = ConnectionConfiguration(self.config)
