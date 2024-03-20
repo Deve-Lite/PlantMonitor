@@ -1,7 +1,6 @@
 from abstractions.configuration import Configuration
 from features.logger.logger import Logger
 
-from ujson import loads
 
 class MqttTypes:
     Fake = "none"
@@ -28,8 +27,12 @@ class BaseMqttClient:
         self.config = mqtt_config
         self.logger = logger
         self.callbacks = {}
+        self._values = {}
 
-    def format_topic(self, topic):
+    def get_values(self, topic_base: str):
+        return {k: v for k, v in self._values.items() if k.startswith(topic_base)}
+
+    def format_topic(self, topic: str):
         self.logger.log_debug(f"Topic not formatted: {topic}")
         return topic
 

@@ -1,14 +1,18 @@
 import sys
 import gc
+import uasyncio
 
 from application import App
+from features.devices.device import DeviceConfig
+from features.devices.device_factory import DeviceFactory
 from features.logger.logger import Logger
 from features.logger.logger_levels import LoggerLevels
-from features.mqtt.mqtt_builder import MqttBuilder
-from features.network.connection_builder import ConnectionBuilder
+from features.mqtt.mqtt_factory import MqttFactory
+from features.network.connection_factory import ConnectionFactory
 
 from utime import sleep
 from machine import reset
+from ujson import loads
 
 
 def setup_fail(logger: Logger, message: str, error_code: int):
@@ -21,16 +25,33 @@ if __name__ == '__main__':
 
     logger = Logger(LoggerLevels.DEBUG)
 
-    connection = ConnectionBuilder(logger).build()
-    connection_result =  connection.connect()
+    connection = ConnectionFactory(logger).create()
+    connection_result = connection.connect()
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
-    mqtt = MqttBuilder(logger).build()
+    mqtt = MqttFactory(logger).create()
     mqtt_connection_result = mqtt.connect()
 
     if not mqtt_connection_result:
         setup_fail(logger, f"Failed to connect with {mqtt.config.type}.", 2)
 
-    app = App(logger)
-    app.start()
+    path = "configuration/devices.json"
+    logger.log_info(f"Reading configuration from: {path}")
+    with open(path, 'r') as file:
+        json_file = file.read()
+    device_configurations = loads(json_file)
+
+    if len(device_configurations) == 0:
+        setup_fail(logger, "No devices found in configuration file.", 3)
+        sleep(5)
+
+    devices = []
+    device_factory = DeviceFactory(mqtt, logger)
+    for device_config in device_configurations:
+        config = DeviceConfig(device_config)
+        device = device_factory.create(config)
+        devices.append(device)
+
+    app = App(devices, logger)
+    uasyncio.run(app.start())

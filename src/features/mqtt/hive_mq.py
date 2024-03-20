@@ -2,11 +2,11 @@ from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient, MqttConfiguration
 from umqtt.simple import MQTTClient
 
+
 class HiveMqClient(BaseMqttClient):
     def __init__(self, mqtt_config: MqttConfiguration, logger: Logger):
         super().__init__(mqtt_config, logger)
         self._base_topic = mqtt_config.json.get("typeSpecificData", {}).get("baseTopic", "")
-        self._callbacks = {}
 
         authentication_data = self.config.json.get("authentication")
         username = authentication_data.get("data", {}).get("username", "")
@@ -44,7 +44,7 @@ class HiveMqClient(BaseMqttClient):
                 self.logger.log_warning(f"{topic} not found in topics. Ignoring message")
                 return
 
-            function = self._callbacks[topic]
+            function = self.callbacks[topic]
             function(data)
 
         except Exception as e:
@@ -66,9 +66,11 @@ class HiveMqClient(BaseMqttClient):
             return False
 
     def publish(self, topic: str, payload: str):
-        payload_bytes = payload.encode('utf-8')
         topic = self.format_topic(topic)
         topic_bytes = topic.encode('utf-8')
+        payload_bytes = payload.encode('utf-8')
+
+        self._values[topic] = payload
         self._client.publish(topic_bytes, payload_bytes)
         self.logger.log_info(f"Published data on topic {topic}")
         self.logger.log_debug(f"Sending Topic: '{topic}' Payload: {payload}. ")

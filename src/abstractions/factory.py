@@ -4,7 +4,7 @@ from ujson import loads
 from features.logger.logger_levels import LoggerLevels
 
 
-class Builder:
+class Factory:
     def __init__(self, config_name, logger: Logger = None):
         if logger is None:
             self.logger = Logger(LoggerLevels.DEBUG)
@@ -16,3 +16,6 @@ class Builder:
         with open(path, 'r') as file:
             json_file = file.read()
         self.config = loads(json_file)
+    
+    def create(self):
+        raise NotImplementedError("Method not implemented")

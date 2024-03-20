@@ -1,14 +1,14 @@
-from abstractions.builder import Builder
+from abstractions.factory import Factory
 from features.logger.logger import Logger
 from features.network.connection import ConnectionConfiguration, ConnectionTypes, Connection
 from features.network.wifi import WiFi
 
 
-class ConnectionBuilder(Builder):
+class ConnectionFactory(Factory):
     def __init__(self, logger: Logger = None):
         super().__init__("connection", logger)
 
-    def build(self):
+    def create(self):
         config = ConnectionConfiguration(self.config)
 
         if config.type == ConnectionTypes.WiFi:
