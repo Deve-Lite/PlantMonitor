@@ -94,10 +94,10 @@ class DHT11(Device):
         current_time = ticks_ms()
 
         if abs(ticks_diff(current_time, self._last_read)) < DHT11.DHT_READ_SPAN:
-            uasyncio.sleep_ms(200)
+            await uasyncio.sleep_ms(200)
             return
 
-        self.logger.log_info(f"Starting loop of dht11 sensor ar {current_time}.")
+        self.logger.log_info(f"Internal loop of dht11 sensor at {current_time}.")
         self._last_read = current_time
         self._sensor.measure()
 
@@ -105,4 +105,5 @@ class DHT11(Device):
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
         self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+
 

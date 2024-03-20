@@ -23,7 +23,7 @@ def setup_fail(logger: Logger, message: str, error_code: int):
 if __name__ == '__main__':
     gc.collect()
 
-    logger = Logger(LoggerLevels.DEBUG)
+    logger = Logger(LoggerLevels.ERROR)
 
     connection = ConnectionFactory(logger).create()
     connection_result = connection.connect()
@@ -53,5 +53,7 @@ if __name__ == '__main__':
         device = device_factory.create(config)
         devices.append(device)
 
-    app = App(devices, logger)
+    app = App(mqtt, devices, logger)
     uasyncio.run(app.start())
+
+

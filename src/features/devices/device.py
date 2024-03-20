@@ -21,7 +21,7 @@ class Topic:
         self.minimalIntervalSeconds = config["minimalIntervalSeconds"]
 
         self._value = 0
-        self._last_update = ticks_ms() - self.minimalIntervalSeconds * MILISECONDS
+        self._last_update = self.minimalIntervalSeconds * MILISECONDS
 
     def update(self, base_topic: str, current_time, current_value):
         if abs(ticks_diff(current_time, self._last_update)) < self.minimalIntervalSeconds * MILISECONDS:
@@ -67,6 +67,7 @@ class DeviceConfig:
         self.ground = config["ground"]
         self.type = config["type"]
         self.name = config["name"]
+        self.loop_span_ms = config["loopSpanMs"]
         self.availability = Availability(config)
 
 
@@ -109,14 +110,21 @@ class Device:
         raise NotImplementedError("Method not implemented")
 
     async def loop(self):
+        self.logger.log_debug(f"Starting loop for device with Id: {self.config.id}")
         while True:
             try:
+                self.logger.log_debug(f"Starting update config.")
                 await self._update_config()
+                self.logger.log_debug(f"Finished update config.")
                 if self.config.availability.enabled:
+                    self.logger.log_debug(f"Starting internal loop.")
                     await self._loop()
+                    self.logger.log_debug(f"Finished internal loop.")
+                    await uasyncio.sleep_ms(self.config.loop_span_ms)
                 else:
                     self.logger.log_info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
-                    await uasyncio.sleep_ms(500)
+                    await uasyncio.sleep_ms(200)
 
             except Exception as e:
                 self.logger.log_error(f"Device loop failed: {e}")
+

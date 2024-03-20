@@ -8,16 +8,11 @@ import uasyncio
 import _thread
 import gc
 
-def message_loop(logger: Logger, mqtt: BaseMqttClient):
+
+async def message_loop(logger: Logger, mqtt: BaseMqttClient):
     while True:
-        try:
-            mqtt.update()
-            sleep(1)
-            gc.collect()
-        except Exception as e:
-            logger.log_error(f"Error in message loop: {e}")
-            sleep(1)
-            raise e
+        mqtt.update()
+        await uasyncio.sleep(1)
 
 
 class App:
@@ -27,12 +22,12 @@ class App:
         self._devices = devices
 
     async def start(self):
-        _thread.start_new_thread(message_loop, (self._logger, self._mqtt))
+        message = uasyncio.create_task(message_loop(self._logger, self._mqtt))
 
-        self._logger.log_debug("Starting device loop.")
+        self._logger.log_debug(f"Starting devices loop: {len(self._devices)}")
+
         for device in self._devices:
-            uasyncio.create_task(device.loop())
+            device_task = uasyncio.create_task(device.loop())
 
-        while True:
-            await uasyncio.sleep(10)
-            self._logger.log_debug("Main loop working.")
+        await uasyncio.gather(message)
+

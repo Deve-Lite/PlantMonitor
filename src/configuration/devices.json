@@ -5,6 +5,7 @@
         "vcc": 36,
         "type": "air",
         "name": "dht11",
+        "loopSpanMs": 500,
         "availability": {
             "enabled": true,
             "topic": "availability"
