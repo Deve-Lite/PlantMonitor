@@ -79,6 +79,7 @@ class DHT11(Device):
         self.data_pin = data["pin"]
         self._temperature = Temperature(mqtt, data["temperature"], logger)
         self._humidity = Humidity(mqtt, data["humidity"])
+        self.loop_span_ms = data["loopSpanMs"]
 
         dht_pin = machine.Pin(self.data_pin, machine.Pin.IN, machine.Pin.PULL_UP)
         self._sensor = dht.DHT11(dht_pin)
@@ -95,6 +96,7 @@ class DHT11(Device):
         current_time = ticks_ms()
 
         if abs(ticks_diff(current_time, self._last_read)) < DHT11.DHT_READ_SPAN:
+            await uasyncio.sleep_ms(self.loop_span_ms)
             return
 
         self.logger.log_info(f"Internal loop of dht11 sensor.")
@@ -105,5 +107,7 @@ class DHT11(Device):
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
         self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+
+        await uasyncio.sleep_ms(self.loop_span_ms)
 
 

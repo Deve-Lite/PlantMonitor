@@ -68,7 +68,6 @@ class DeviceConfig:
         self.ground = config["ground"]
         self.type = config["type"]
         self.name = config["name"]
-        self.loop_span_ms = config["loopSpanMs"]
         self.availability = Availability(config)
 
 
@@ -121,10 +120,9 @@ class Device:
                     self.logger.log_debug(f"Starting internal loop.")
                     await self._loop()
                     self.logger.log_debug(f"Finished internal loop.")
-                    await uasyncio.sleep_ms(self.config.loop_span_ms)
                 else:
                     self.logger.log_info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
-                    await uasyncio.sleep_ms(200)
+                    await uasyncio.sleep_ms(500)
 
             except Exception as e:
                 self.logger.log_error(f"Device loop failed: {e}")
