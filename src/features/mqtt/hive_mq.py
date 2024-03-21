@@ -1,6 +1,6 @@
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient, MqttConfiguration
-from umqtt.simple import MQTTClient
+from umqtt.robust import MQTTClient
 
 
 class HiveMqClient(BaseMqttClient):
@@ -80,3 +80,4 @@ class HiveMqClient(BaseMqttClient):
         self._client.subscribe(topic)
         self.callbacks[topic] = callback
         self.logger.log_info(f"Subscribed to topic: {topic}")
+
