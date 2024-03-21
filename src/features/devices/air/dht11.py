@@ -1,7 +1,7 @@
 from features.devices.device import Device, DeviceConfig, Topic
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient
-from utime import ticks_ms, ticks_diff
+from utime import ticks_ms, ticks_diff, time
 from ujson import dumps, loads
 import machine
 import dht
@@ -41,7 +41,7 @@ class Temperature(Topic):
         json = {
             "unit": self.unit,
             "value": value,
-            "time": self._last_update
+            "time": time()
         }
 
         return dumps(json)
@@ -94,10 +94,9 @@ class DHT11(Device):
         current_time = ticks_ms()
 
         if abs(ticks_diff(current_time, self._last_read)) < DHT11.DHT_READ_SPAN:
-            await uasyncio.sleep_ms(200)
             return
 
-        self.logger.log_info(f"Internal loop of dht11 sensor at {current_time}.")
+        self.logger.log_info(f"Internal loop of dht11 sensor.")
         self._last_read = current_time
         self._sensor.measure()
 

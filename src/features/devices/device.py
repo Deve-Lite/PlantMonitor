@@ -1,6 +1,6 @@
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient
-from utime import ticks_ms, ticks_diff
+from utime import ticks_ms, ticks_diff, time
 from ujson import dumps, loads
 import uasyncio
 
@@ -47,7 +47,7 @@ class Topic:
         json = {
             "unit": self.unit,
             "value": self._value,
-            "time": self._last_update
+            "time": time()
         }
 
         return dumps(json)

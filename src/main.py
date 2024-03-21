@@ -1,6 +1,7 @@
 import sys
 import gc
 import uasyncio
+import ntptime
 
 from application import App
 from features.devices.device import DeviceConfig
@@ -10,7 +11,7 @@ from features.logger.logger_levels import LoggerLevels
 from features.mqtt.mqtt_factory import MqttFactory
 from features.network.connection_factory import ConnectionFactory
 
-from utime import sleep
+from utime import sleep, localtime, gmtime
 from machine import reset
 from ujson import loads
 
@@ -29,6 +30,10 @@ if __name__ == '__main__':
     connection_result = connection.connect()
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
+
+    logger.log_info("Synchronizing time with ntptime module")
+    ntptime.settime()
+    logger.log_info(f"Global time: {gmtime()}")
 
     mqtt = MqttFactory(logger).create()
     mqtt_connection_result = mqtt.connect()
