@@ -5,13 +5,13 @@
         "vcc": 36,
         "type": "air",
         "name": "dht11",
-        "loopSpanMs": 500,
         "availability": {
             "enabled": true,
             "topic": "availability"
         },
         "data":
         {
+            "loopSpanMs": 500,
             "pin": 1,
             "temperature":
             {

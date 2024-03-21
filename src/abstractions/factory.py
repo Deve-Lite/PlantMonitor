@@ -19,3 +19,27 @@ class Factory:
     
     def create(self):
         raise NotImplementedError("Method not implemented")
+
+
+class MultiFactory(Factory):
+    def __init__(self, config_name, logger: Logger = None):
+        super().__init__(config_name, logger)
+        self.max_items = 1
+
+    def _create_item(self, config):
+        raise NotImplementedError("Method not implemented")
+
+    def create(self):
+        if len(self.config) == 0:
+            return []
+
+        if len(self.config) >= self.max_items:
+            raise ValueError(f"Number of items exceeds the maximum number of items: {self.max_items} actual {len(self.config)}")
+
+        items = []
+
+        for item_config in self.config:
+            item = self._create_item(item_config)
+            items.append(item)
+
+        return items
