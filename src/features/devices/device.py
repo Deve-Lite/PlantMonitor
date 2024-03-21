@@ -45,9 +45,10 @@ class Topic:
             return self._value
 
         json = {
-            "unit": self.unit,
             "value": self._value,
-            "time": time()
+            "unit": self.unit,
+            "time": time(),
+            "timeUnit": "s"
         }
 
         return dumps(json)

@@ -39,9 +39,10 @@ class Temperature(Topic):
             return value
 
         json = {
-            "unit": self.unit,
             "value": value,
-            "time": time()
+            "unit": self.unit,
+            "time": time(),
+            "timeUnit": "s"
         }
 
         return dumps(json)
