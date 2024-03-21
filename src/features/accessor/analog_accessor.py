@@ -7,7 +7,7 @@ from machine import ADC, Pin
 import uasyncio
 
 
-class AccessorConfig:
+class AnalogAccessorConfig:
     def __init__(self, config: {}):
         self.slots = config["slots"]
         self.adc_pin = config["adcPin"]
@@ -16,8 +16,8 @@ class AccessorConfig:
         self.id = config["id"]
 
 
-class Accessor:
-    def __init__(self, config: AccessorConfig, logger: Logger):
+class AnalogAccessor:
+    def __init__(self, config: AnalogAccessorConfig, logger: Logger):
         self.logger = logger
         self.config = config
 
@@ -30,7 +30,7 @@ class Accessor:
         self.lock = uasyncio.Lock()
 
     def read(self, channel: int):
-        if idx < 0 or idx >= self.config.slots:
+        if channel < 0 or channel >= self.config.slots:
             return None
 
         try:
