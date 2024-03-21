@@ -14,7 +14,7 @@ class DeviceFactory(MultiFactory):
         self.analog_accessors = analog_accessors
         self.max_items = 48
 
-    def _create(self, config):
+    def _create_item(self, config):
         config = DeviceConfig(config)
 
         if config.type == "air":
