@@ -1,14 +1,17 @@
 from abstractions.factory import MultiFactory
+from features.analog_accessor.analog_accessor import AnalogAccessor
 from features.logger.logger import Logger
 from features.devices.air.dht11 import DHT11
 from features.devices.device import DeviceConfig
+from features.mqtt.mqtt import BaseMqttClient
 
 
 class DeviceFactory(MultiFactory):
-    def __init__(self, client, logger: Logger):
+    def __init__(self, client: BaseMqttClient, analog_accessors: [AnalogAccessor], logger: Logger):
         super().__init__("devices", logger)
         self.logger = logger
         self.client = client
+        self.analog_accessors = analog_accessors
         self.max_items = 48
 
     def _create(self, config):

@@ -1,9 +1,10 @@
 from abstractions.factory import MultiFactory
-from features.accessor.analog_accessor import AnalogAccessorConfig, AnalogAccessor
+from features.analog_accessor.analog_accessor import AnalogAccessorConfig, AnalogAccessor
+from features.logger.logger import Logger
 
 
-class AccessorFactory(MultiFactory):
-    def __init__(self, logger):
+class AnalogAccessorFactory(MultiFactory):
+    def __init__(self, logger: Logger):
         super().__init__("accessors", logger)
         self.max_items = 3
 

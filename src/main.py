@@ -4,7 +4,7 @@ import uasyncio
 import ntptime
 
 from application import App
-from features.devices.device import DeviceConfig
+from features.analog_accessor.analog_accessor_factory import AnalogAccessorFactory
 from features.devices.device_factory import DeviceFactory
 from features.logger.logger import Logger
 from features.logger.logger_levels import LoggerLevels
@@ -13,12 +13,13 @@ from features.network.connection_factory import ConnectionFactory
 
 from utime import sleep, localtime, gmtime
 from machine import reset
-from ujson import loads
 
 
 def setup_fail(logger: Logger, message: str, error_code: int):
     logger.log_error(message)
+    sleep(5)
     sys.exit(error_code)
+    # in release change to reset()
 
 
 if __name__ == '__main__':
@@ -41,22 +42,11 @@ if __name__ == '__main__':
     if not mqtt_connection_result:
         setup_fail(logger, f"Failed to connect with {mqtt.config.type}.", 2)
 
-    path = "configuration/devices.json"
-    logger.log_info(f"Reading configuration from: {path}")
-    with open(path, 'r') as file:
-        json_file = file.read()
-    device_configurations = loads(json_file)
+    accessor_factory = AnalogAccessorFactory(logger)
+    accessors = accessor_factory.create()
 
-    if len(device_configurations) == 0:
-        setup_fail(logger, "No devices found in configuration file.", 3)
-        sleep(5)
-
-    devices = []
-    device_factory = DeviceFactory(mqtt, logger)
-    for device_config in device_configurations:
-        config = DeviceConfig(device_config)
-        device = device_factory.create(config)
-        devices.append(device)
+    device_factory = DeviceFactory(mqtt, accessors, logger)
+    devices = device_factory.create()
 
     app = App(mqtt, devices, logger)
     uasyncio.run(app.start())
