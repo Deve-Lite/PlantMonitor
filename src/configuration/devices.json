@@ -82,7 +82,7 @@
         {
             "loopSpanMs": 500,
             "mux_id": 1,
-            "channel": 1,
+            "channel": 2,
             "insolation":
             {
                 "unit": "Percentage",
