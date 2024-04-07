@@ -14,8 +14,6 @@ class Insolation(Topic):
 
 
 class InsolationSensor(Device):
-    IS_READ_SPAN = 2000
-
     def __init__(self, mqtt: BaseMqttClient,
                  config: DeviceConfig,
                  logger: Logger,
@@ -29,25 +27,19 @@ class InsolationSensor(Device):
         
         self._sensor = InsolationDriver(analog_accessor, channel)
 
-        self._last_read = ticks_ms() - self.IS_READ_SPAN
+        
 
 
     async def _update_config(self):
         pass
 
     async def _loop(self):
-        current_time = ticks_ms()
-
-        if abs(ticks_diff(current_time, self._last_read)) < InsolationSensor.IS_READ_SPAN:
-            await uasyncio.sleep_ms(self.loop_span_ms)
-            return
-
         self.logger.log_info(f"Internal loop of Insolation sensor.")
-        self._last_read = current_time
+       
+        current_time = ticks_ms()
         self._sensor.measure()
 
         insolation = self._sensor.insolation()
-
         self._insolation.update(self.base_topic, current_time, insolation)
        
 
