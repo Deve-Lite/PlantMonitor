@@ -1,5 +1,3 @@
-
-
 class Configuration:
     def __init__(self, json):
         self.json = json
@@ -8,6 +6,7 @@ class Configuration:
         if json is None:
             json = self.json
         value = json.get(name)
+        print(value)
         if value < min_v or value > max_v:
             raise ValueError(f"Invalid configuration {value} not in range ({min_v},{max_v})")
         return value

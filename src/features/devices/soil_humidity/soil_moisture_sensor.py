@@ -24,7 +24,7 @@ class SoilMoistureSensor(Device):
         self._moisture = Moisture(mqtt, data["moisture"])
         self.loop_span_ms = data["loopSpanMs"]
         channel = data["channel"]
-        self._sensor = SMSDriver(analog_accessor, channel)
+        self.sensor = SMSDriver(analog_accessor, channel)
 
 
 
@@ -36,9 +36,9 @@ class SoilMoistureSensor(Device):
         
         
         current_time = ticks_ms()
-        self._sensor.measure()
+        await self.sensor.measure()
 
-        moisture = self._sensor.moisture()
+        moisture = self.sensor.moisture()
 
         self._moisture.update(self.base_topic, current_time, moisture)
         self.logger.log_debug(f"Moisture: {moisture}.")

@@ -10,7 +10,7 @@ from features.mqtt.mqtt import BaseMqttClient
 
 
 class DeviceFactory(MultiFactory):
-    def __init__(self, client: BaseMqttClient, analog_accessors: [AnalogAccessor], logger: Logger):
+    def __init__(self, client: BaseMqttClient, analog_accessors: [], logger: Logger):
         super().__init__("devices", logger)
         self.logger = logger
         self.client = client
@@ -36,7 +36,7 @@ class DeviceFactory(MultiFactory):
         if config.type == "light":
             if config.name == "is":
 
-                mux_id = config.config["mux_id"]
+                mux_id = int(config.config["mux_id"])
                 accessor = self.find_analog_accessor(mux_id)
 
                 return InsolationSensor(self.client, config, self.logger, accessor)
@@ -45,7 +45,8 @@ class DeviceFactory(MultiFactory):
 
     def find_analog_accessor(self, mux_id):
         for accessor in self.analog_accessors:
-            if accessor.config.id == mux_id:
+            if int(accessor.config.id) == mux_id:
                 return accessor
         
-        raise ValueError(f"There isn't any analog accessor connected to pin {device_pin}")
+        print("HEEEEEJ")
+        raise ValueError(f"There isn't any analog accessor with id {mux_id}")

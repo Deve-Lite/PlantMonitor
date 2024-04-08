@@ -25,7 +25,7 @@ class InsolationSensor(Device):
         self.loop_span_ms = data["loopSpanMs"]
         channel = data["channel"]
         
-        self._sensor = InsolationDriver(analog_accessor, channel)
+        self.sensor = InsolationDriver(analog_accessor, channel)
 
         
 
@@ -37,9 +37,9 @@ class InsolationSensor(Device):
         self.logger.log_info(f"Internal loop of Insolation sensor.")
        
         current_time = ticks_ms()
-        self._sensor.measure()
+        await self.sensor.measure()
 
-        insolation = self._sensor.insolation()
+        insolation = self.sensor.insolation()
         self._insolation.update(self.base_topic, current_time, insolation)
        
 
