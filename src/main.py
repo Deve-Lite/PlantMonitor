@@ -25,7 +25,7 @@ def setup_fail(logger: Logger, message: str, error_code: int):
 if __name__ == '__main__':
     gc.collect()
 
-    logger = Logger(LoggerLevels.ERROR)
+    logger = Logger(LoggerLevels.DEBUG)
 
     connection = ConnectionFactory(logger).create()
     connection_result = connection.connect()

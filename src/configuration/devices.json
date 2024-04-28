@@ -1,10 +1,10 @@
 [
     {
         "id": "1",
-        "ground": 38,
-        "vcc": 36,
         "type": "air",
         "name": "dht11",
+        "ground": 38,
+        "vcc": 36,
         "availability": {
             "enabled": true,
             "topic": "availability"
@@ -29,6 +29,64 @@
             {
                 "unit": "Percentage",
                 "topic": "humidity",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
+                    "value": 1,
+                    "minimalIntervalSeconds": 20
+                }
+            }
+        }
+    },
+
+    {
+        "id": "2",
+        "type": "soil",
+        "name": "sms",
+        "ground": 38,
+        "vcc": 36,
+        "availability": {
+            "enabled": true,
+            "topic": "availability"
+        },
+        "data":
+        {
+            "loopSpanMs": 500,
+            "mux_id": 1,
+            "channel": 1,
+            "moisture":
+            {
+                "unit": "Percentage",
+                "topic": "moisture",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
+                    "value": 1,
+                    "minimalIntervalSeconds": 20
+                }
+            }
+        }
+    },
+
+    {
+        "id": "3",
+        "type": "light",
+        "name": "is",
+        "ground": 38,
+        "vcc": 36,
+        "availability": {
+            "enabled": true,
+            "topic": "availability"
+        },
+        "data":
+        {
+            "loopSpanMs": 500,
+            "mux_id": 1,
+            "channel": 2,
+            "insolation":
+            {
+                "unit": "Percentage",
+                "topic": "insolation",
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",

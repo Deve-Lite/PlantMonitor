@@ -1,7 +1,6 @@
 from abstractions.configuration import Configuration
 from features.logger.logger import Logger
 
-
 class MqttTypes:
     Fake = "none"
     HiveMq = "hivemq"

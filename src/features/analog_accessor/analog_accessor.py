@@ -29,7 +29,7 @@ class AnalogAccessor:
 
         self.lock = uasyncio.Lock()
 
-    def read(self, channel: int):
+    async def read(self, channel: int):
         if channel < 0 or channel >= self.config.slots:
             return None
 
@@ -37,7 +37,7 @@ class AnalogAccessor:
             await self.lock.acquire()
 
             self._apply_idx(channel)
-            value = self.adc.read()
+            value = self.adc.read_u16()
             self.logger.log_debug(f"ADC value: {value}")
 
             return value

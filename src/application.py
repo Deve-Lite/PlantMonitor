@@ -16,7 +16,7 @@ async def message_loop(logger: Logger, mqtt: BaseMqttClient):
 
 
 class App:
-    def __init__(self, mqtt: BaseMqttClient, devices: [Device], logger: Logger):
+    def __init__(self, mqtt: BaseMqttClient, devices: [], logger: Logger):
         self._mqtt = mqtt
         self._logger = logger
         self._devices = devices
