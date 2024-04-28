@@ -34,14 +34,11 @@ This project aims to develop a device using Raspberry Pi Pico that can monitor p
 - Monitoring of air humidity, temperature, plant moisture, and light intensity.
 - Modular design for easy attachment of multiple sensors.
 - MQTT protocol for communication with other devices.
-- On/off button for device control.
 - Python programming language for software development.
 
 ### Documentation 
-TBA.
 
-### Wiring Example
-TBA.
+Check `docs` folder for more information.
 
 ### License
 This project is licensed under the MIT License - see the `LICENSE` for details.

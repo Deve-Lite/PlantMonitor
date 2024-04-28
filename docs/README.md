@@ -142,7 +142,7 @@ List of devices that are recognized by id.
 ]
 ```
 
-## Devices
+## Sub Devices
 
 List of device task and devices supported with drivers.
 
@@ -429,3 +429,17 @@ Example received payload:
         }
     }
 ```
+
+### Device Data Visualization
+
+TBA.
+
+
+## Running the project
+
+In order to run project first upload microptyhon u2f file on pico board. Then copy all contnent of src folder to pico (remember about updating configuration files).
+
+
+## 3d model
+
+TBA.
