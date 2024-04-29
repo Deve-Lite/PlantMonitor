@@ -12,7 +12,7 @@ class Factory:
             self.logger = logger
 
         path = f"configuration/{config_name}.json"
-        logger.log_info(f"Reading configuration from: {path}")
+        logger.info(f"Reading configuration from: {path}")
         with open(path, 'r') as file:
             json_file = file.read()
         self.config = loads(json_file)

@@ -6,7 +6,7 @@ import ntptime
 from application import App
 from features.analog_accessor.analog_accessor_factory import AnalogAccessorFactory
 from features.devices.device_factory import DeviceFactory
-from features.logger.logger import Logger
+from features.logger.file_logger import FileLogger
 from features.logger.logger_levels import LoggerLevels
 from features.mqtt.mqtt_factory import MqttFactory
 from features.network.connection_factory import ConnectionFactory
@@ -16,7 +16,7 @@ from machine import reset
 
 
 def setup_fail(logger: Logger, message: str, error_code: int):
-    logger.log_error(message)
+    logger.error(message)
     sleep(5)
     sys.exit(error_code)
     # in release change to reset()
@@ -25,16 +25,16 @@ def setup_fail(logger: Logger, message: str, error_code: int):
 if __name__ == '__main__':
     gc.collect()
 
-    logger = Logger(LoggerLevels.DEBUG)
+    logger = FileLogger(console=True, debug=False)
 
     connection = ConnectionFactory(logger).create()
     connection_result = connection.connect()
     if not connection_result:
         setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
 
-    logger.log_info("Synchronizing time with ntptime module")
+    logger.info("Synchronizing time with ntptime module")
     ntptime.settime()
-    logger.log_info(f"Global time: {gmtime()}")
+    logger.info(f"Global time: {gmtime()}")
 
     mqtt = MqttFactory(logger).create()
     mqtt_connection_result = mqtt.connect()

@@ -26,11 +26,11 @@ class Temperature(Topic):
         new_unit = collection["unit"]
 
         if new_unit not in self.AVAILABLE_UNITS:
-            self.logger.log_warning(f"Unit {new_unit} is not supported. Supported units: {self.AVAILABLE_UNITS}")
+            self.logger.warning(f"Unit {new_unit} is not supported. Supported units: {self.AVAILABLE_UNITS}")
             return
 
         self.unit = new_unit
-        self.logger.log_info(f"Unit changed to {new_unit}")
+        self.logger.info(f"Unit changed to {new_unit}")
 
     def format_data(self):
         value = self._convert_unit(self._value)
@@ -99,14 +99,14 @@ class DHT11(Device):
             await uasyncio.sleep_ms(self.loop_span_ms)
             return
 
-        self.logger.log_info(f"Internal loop of dht11 sensor.")
+        self.logger.info(f"Internal loop of dht11 sensor.")
         self._last_read = current_time
         self._sensor.measure()
 
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
-        self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+        self.logger.debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

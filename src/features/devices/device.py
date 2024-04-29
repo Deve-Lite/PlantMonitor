@@ -111,20 +111,20 @@ class Device:
         raise NotImplementedError("Method not implemented")
 
     async def loop(self):
-        self.logger.log_debug(f"Starting loop for device with Id: {self.config.id}")
+        self.logger.debug(f"Starting loop for device with Id: {self.config.id}")
         while True:
             #try:
-            self.logger.log_debug(f"Starting update config.")
+            self.logger.debug(f"Starting update config.")
             await self._update_config()
-            self.logger.log_debug(f"Finished update config.")
+            self.logger.debug(f"Finished update config.")
             if self.config.availability.enabled:
-                self.logger.log_debug(f"Starting internal loop.")
+                self.logger.debug(f"Starting internal loop.")
                 await self._loop()
-                self.logger.log_debug(f"Finished internal loop.")
+                self.logger.debug(f"Finished internal loop.")
             else:
-                self.logger.log_info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
+                self.logger.info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
                 await uasyncio.sleep_ms(500)
 
             #except Exception as e:
-             #   self.logger.log_error(f"Device loop failed: {e}")
+             #   self.logger.error(f"Device loop failed: {e}")
 

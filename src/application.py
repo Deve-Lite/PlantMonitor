@@ -24,7 +24,7 @@ class App:
     async def start(self):
         message = uasyncio.create_task(message_loop(self._logger, self._mqtt))
 
-        self._logger.log_debug(f"Starting devices loop: {len(self._devices)}")
+        self._logger.debug(f"Starting devices loop: {len(self._devices)}")
 
         for device in self._devices:
             device_task = uasyncio.create_task(device.loop())

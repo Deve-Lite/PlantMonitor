@@ -11,7 +11,7 @@ class HiveMqClient(BaseMqttClient):
         authentication_data = self.config.json.get("authentication")
         username = authentication_data.get("data", {}).get("username", "")
         password = authentication_data.get("data", {}).get("password", "")
-        self.logger.log_debug(f"Connecting to server with: {username} {password}")
+        self.logger.debug(f"Connecting to server with: {username} {password}")
         self._client = MQTTClient(
             client_id=self.config.client,
             server=self.config.server,
@@ -29,7 +29,7 @@ class HiveMqClient(BaseMqttClient):
             return super().format_topic(topic)
 
         topic = f"{self._base_topic}{topic}"
-        self.logger.log_debug(f"Topic formatted: {topic}")
+        self.logger.debug(f"Topic formatted: {topic}")
         return topic
 
     def callback(self, topic, message):
@@ -37,32 +37,32 @@ class HiveMqClient(BaseMqttClient):
             topic = topic.decode("utf-8")
             data = message.decode("utf-8")
 
-            self.logger.log_info(f"Data from topic '{topic}' received. ")
-            self.logger.log_debug(f"Received Topic: '{topic}' Payload: {data}. ")
+            self.logger.info(f"Data from topic '{topic}' received. ")
+            self.logger.debug(f"Received Topic: '{topic}' Payload: {data}. ")
 
             if topic not in self.callbacks:
-                self.logger.log_warning(f"{topic} not found in topics. Ignoring message")
+                self.logger.warning(f"{topic} not found in topics. Ignoring message")
                 return
 
             function = self.callbacks[topic]
             function(data)
 
         except Exception as e:
-            self.logger.log_error(f"Error receiving data on {topic}. Error {e}")
+            self.logger.error(f"Error receiving data on {topic}. Error {e}")
 
     def update(self):
-        self.logger.log_info(f"Fetching data from broker: {self.config.server}")
+        self.logger.info(f"Fetching data from broker: {self.config.server}")
         self._client.check_msg()
 
     def connect(self):
         try:
-            self.logger.log_info(f"Connecting to broker: {self.config.server}")
+            self.logger.info(f"Connecting to broker: {self.config.server}")
             self._client.connect()
-            self.logger.log_info(f"Successfully connected to broker: {self.config.server}")
+            self.logger.info(f"Successfully connected to broker: {self.config.server}")
             return True
         except Exception as e:
-            self.logger.log_info(f"Failed to connect to broker: {self.config.server}")
-            self.logger.log_info(f"Connection error {e}")
+            self.logger.info(f"Failed to connect to broker: {self.config.server}")
+            self.logger.info(f"Connection error {e}")
             return False
 
     def publish(self, topic: str, payload: str):
@@ -72,12 +72,12 @@ class HiveMqClient(BaseMqttClient):
 
         self._values[topic] = payload
         self._client.publish(topic_bytes, payload_bytes)
-        self.logger.log_info(f"Published data on topic {topic}")
-        self.logger.log_debug(f"Sending Topic: '{topic}' Payload: {payload}. ")
+        self.logger.info(f"Published data on topic {topic}")
+        self.logger.debug(f"Sending Topic: '{topic}' Payload: {payload}. ")
 
     def subscribe(self, topic: str, callback):
         topic = self.format_topic(topic)
         self._client.subscribe(topic)
         self.callbacks[topic] = callback
-        self.logger.log_info(f"Subscribed to topic: {topic}")
+        self.logger.info(f"Subscribed to topic: {topic}")
 

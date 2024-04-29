@@ -32,7 +32,7 @@ class SoilMoistureSensor(Device):
         pass
 
     async def _loop(self):
-        self.logger.log_info(f"Internal loop of Soil moisture sensor.")
+        self.logger.info(f"Internal loop of Soil moisture sensor.")
         
         
         current_time = ticks_ms()
@@ -41,7 +41,7 @@ class SoilMoistureSensor(Device):
         moisture = self.sensor.moisture()
 
         self._moisture.update(self.base_topic, current_time, moisture)
-        self.logger.log_debug(f"Moisture: {moisture}.")
+        self.logger.debug(f"Moisture: {moisture}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

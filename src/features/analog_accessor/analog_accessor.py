@@ -38,11 +38,11 @@ class AnalogAccessor:
 
             self._apply_idx(channel)
             value = self.adc.read_u16()
-            self.logger.log_debug(f"ADC value: {value}")
+            self.logger.debug(f"ADC value: {value}")
 
             return value
         except Exception as e:
-            self.logger.log_error(f"Error reading value from ADC. Error: {e}")
+            self.logger.error(f"Error reading value from ADC. Error: {e}")
             return None
         finally:
             self.lock.release()

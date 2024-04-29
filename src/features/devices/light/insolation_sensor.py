@@ -34,7 +34,7 @@ class InsolationSensor(Device):
         pass
 
     async def _loop(self):
-        self.logger.log_info(f"Internal loop of Insolation sensor.")
+        self.logger.info(f"Internal loop of Insolation sensor.")
        
         current_time = ticks_ms()
         await self.sensor.measure()
@@ -43,7 +43,7 @@ class InsolationSensor(Device):
         self._insolation.update(self.base_topic, current_time, insolation)
        
 
-        self.logger.log_debug(f"Insolation: {insolation}.")
+        self.logger.debug(f"Insolation: {insolation}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

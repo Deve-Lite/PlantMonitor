@@ -33,22 +33,22 @@ class BaseMqttClient:
         return {k: v for k, v in self._values.items() if k.startswith(topic_base)}
 
     def format_topic(self, topic: str):
-        self.logger.log_debug(f"Topic not formatted: {topic}")
+        self.logger.debug(f"Topic not formatted: {topic}")
         return topic
 
     def update(self):
-        self.logger.log_info("Fake fetching data from broker.")
+        self.logger.info("Fake fetching data from broker.")
         pass
 
     def connect(self):
-        self.logger.log_info(f"Fake connect to MQTT Broker.")
+        self.logger.info(f"Fake connect to MQTT Broker.")
         return True
 
     def publish(self, topic: str, json_data: str):
-        self.logger.log_info(f"Fake publish on topic: {topic} data: {json_data}")
+        self.logger.info(f"Fake publish on topic: {topic} data: {json_data}")
 
     def subscribe(self, topic: str, callback):
         topic = self.format_topic(topic)
-        self.logger.log_info(f"Subscribed to topic: {topic}")
+        self.logger.info(f"Subscribed to topic: {topic}")
         self.callbacks[topic] = callback
 
