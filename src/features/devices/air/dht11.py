@@ -17,8 +17,7 @@ class Temperature(Topic):
                        "Celsius", "Fahrenheit", "Kelvin"]
 
     def __init__(self, mqtt: BaseMqttClient, config, logger: Logger):
-        super().__init__(mqtt, config)
-        self.logger = logger
+        super().__init__(mqtt, config, logger)
         self.unit_topic = config["unitTopic"]
 
     def update_unit(self, payload: str):
@@ -78,7 +77,7 @@ class DHT11(Device):
 
         self.data_pin = data["pin"]
         self._temperature = Temperature(mqtt, data["temperature"], logger)
-        self._humidity = Humidity(mqtt, data["humidity"])
+        self._humidity = Humidity(mqtt, data["humidity"], logger)
         self.loop_span_ms = data["loopSpanMs"]
 
         dht_pin = machine.Pin(self.data_pin, machine.Pin.IN, machine.Pin.PULL_UP)

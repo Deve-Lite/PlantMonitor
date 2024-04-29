@@ -9,7 +9,7 @@ MILISECONDS = 1000
 
 
 class Topic:
-    def __init__(self, mqtt: BaseMqttClient, config):
+    def __init__(self, mqtt: BaseMqttClient, config, logger: Logger):
         self.mqtt = mqtt
         self.config = config
         self.unit = config["unit"]
@@ -24,11 +24,16 @@ class Topic:
         self._value = 0
         self._last_update = self.minimal_interval_seconds * MILISECONDS
 
+        self.logger=logger
+
     def update(self, base_topic: str, current_time, current_value):
         if abs(ticks_diff(current_time, self._last_update)) < self.minimal_interval_seconds * MILISECONDS:
             return False
 
         if abs(current_value - self._value) == 0:
+            return False
+
+        if abs(current_value - self._value) < self.threshold_value:
             return False
 
         self._last_update = current_time
@@ -38,6 +43,7 @@ class Topic:
         message = self.format_data()
 
         self.mqtt.publish(topic, message)
+        self.logger.info(f"Published update on {topic}. Value: {self._value}.")
 
         return True
 
@@ -56,8 +62,8 @@ class Topic:
 
 
 class ADCTopic(Topic):
-    def __init__(self, mqtt: BaseMqttClient, config):
-        super().__init__(mqtt, config)
+    def __init__(self, mqtt: BaseMqttClient, config, logger: Logger):
+        super().__init__(mqtt, config, logger)
         self._update_start_time = None
 
     def update(self, base_topic: str, current_time, current_value):
@@ -83,6 +89,7 @@ class ADCTopic(Topic):
         message = self.format_data()
 
         self.mqtt.publish(topic, message)
+        self.logger.info(f"Published update on {topic}. Value: {self._value}.")
 
         return True
 
@@ -144,18 +151,17 @@ class Device:
     async def loop(self):
         self.logger.debug(f"Starting loop for device with Id: {self.config.id}")
         while True:
-            #try:
-            self.logger.debug(f"Starting update config.")
-            await self._update_config()
-            self.logger.debug(f"Finished update config.")
-            if self.config.availability.enabled:
-                self.logger.debug(f"Starting internal loop.")
-                await self._loop()
-                self.logger.debug(f"Finished internal loop.")
-            else:
-                self.logger.info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
-                await uasyncio.sleep_ms(500)
-
-            #except Exception as e:
-             #   self.logger.error(f"Device loop failed: {e}")
+            try:
+                self.logger.debug(f"Starting update config.")
+                await self._update_config()
+                self.logger.debug(f"Finished update config.")
+                if self.config.availability.enabled:
+                    self.logger.debug(f"Starting internal loop.")
+                    await self._loop()
+                    self.logger.debug(f"Finished internal loop.")
+                else:
+                    self.logger.info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
+                    await uasyncio.sleep_ms(500)
+            except Exception as e:
+                self.logger.error(f"Device loop failed: {e}")
 

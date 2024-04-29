@@ -21,7 +21,7 @@ class SoilMoistureSensor(Device):
         super().__init__(mqtt, config, logger)
         data = config.config
 
-        self._moisture = Moisture(mqtt, data["moisture"])
+        self._moisture = Moisture(mqtt, data["moisture"], logger)
         self.loop_span_ms = data["loopSpanMs"]
         channel = data["channel"]
         self.sensor = SMSDriver(analog_accessor, channel)

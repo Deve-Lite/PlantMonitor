@@ -51,8 +51,16 @@ class FileLogger(Logger):
                 print(data)
 
     def _write_to_file(self, data: str):
+        # Check file size
+        info = os.stat(self.file_path)
+        filesize = info[6]  # Size of the file in bytes
+        if filesize > 500 * 1024:  # 500 KB in bytes
+            print(f"File size exceeded. Removing {self.file_path}")
+            os.remove(self.file_path)
+
         with open(self.file_path, 'a') as file:
             file.write(data + '\n')
+
 
     @staticmethod
     def _dir_exists(filename):

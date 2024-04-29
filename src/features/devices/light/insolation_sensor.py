@@ -21,7 +21,7 @@ class InsolationSensor(Device):
         super().__init__(mqtt, config, logger)
         data = config.config
 
-        self._insolation = Insolation(mqtt, data["insolation"])
+        self._insolation = Insolation(mqtt, data["insolation"], logger)
         self.loop_span_ms = data["loopSpanMs"]
         channel = data["channel"]
         
