@@ -17,15 +17,15 @@ class Topic:
         self.sendAsJson = config["sendAsJson"]
 
         config = config["threshold"]
-        self.type = config["type"]
-        self.value = config["value"]
-        self.minimalIntervalSeconds = config["minimalIntervalSeconds"]
+        self.threshold_type = config["type"]
+        self.threshold_value = config["value"]
+        self.minimal_interval_seconds = config["minimalIntervalSeconds"]
 
         self._value = 0
-        self._last_update = self.minimalIntervalSeconds * MILISECONDS
+        self._last_update = self.minimal_interval_seconds * MILISECONDS
 
     def update(self, base_topic: str, current_time, current_value):
-        if abs(ticks_diff(current_time, self._last_update)) < self.minimalIntervalSeconds * MILISECONDS:
+        if abs(ticks_diff(current_time, self._last_update)) < self.minimal_interval_seconds * MILISECONDS:
             return False
 
         if abs(current_value - self._value) == 0:
@@ -54,6 +54,37 @@ class Topic:
 
         return dumps(json)
 
+
+class ADCTopic(Topic):
+    def __init__(self, mqtt: BaseMqttClient, config):
+        super().__init__(mqtt, config)
+        self._update_start_time = None
+
+    def update(self, base_topic: str, current_time, current_value):
+        if abs(ticks_diff(current_time, self._last_update)) < self.minimal_interval_seconds * MILISECONDS:
+            return False
+
+        if abs(current_value - self._value) < self.threshold_value:
+            self._update_start_time = None
+            return False
+        else:
+            if self._update_start_time is None:
+                self._update_start_time = current_time
+
+            # Ensure that this is real change not temporary breeze etc.
+            if abs(ticks_diff(current_time, self._update_start_time)) < 60 * MILISECONDS:
+                return False
+
+        self._last_update = current_time
+        self._value = current_value
+        self._update_start_time = None
+
+        topic = f"{base_topic}/{self.topic}"
+        message = self.format_data()
+
+        self.mqtt.publish(topic, message)
+
+        return True
 
 class Availability:
     def __init__(self, config):

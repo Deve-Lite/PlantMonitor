@@ -1,4 +1,4 @@
-from features.devices.device import Device, DeviceConfig, Topic
+from features.devices.device import Device, DeviceConfig, ADCTopic
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient
 from utime import ticks_ms, ticks_diff, time
@@ -9,7 +9,7 @@ from drivers.sms import SMSDriver
 import uasyncio
 
 
-class Moisture(Topic):
+class Moisture(ADCTopic):
     pass
 
 

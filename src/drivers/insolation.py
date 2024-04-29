@@ -17,6 +17,6 @@ class InsolationDriver:
     def insolation(self):
         if self.insolation_val < 0:
             raise RuntimeError("insolation() method called before measure()", self.insolation_val)
-        return (self.insolation_val - self.min_insolation) * 100 / (self.max_insolation - self.min_insolation)
+        return int((self.insolation_val - self.min_insolation) * 100 / (self.max_insolation - self.min_insolation))
 
     
