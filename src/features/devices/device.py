@@ -4,7 +4,6 @@ from utime import ticks_ms, ticks_diff, time
 from ujson import dumps, loads
 import uasyncio
 
-
 MILISECONDS = 1000
 
 
@@ -23,21 +22,31 @@ class Topic:
 
         self._value = 0
         self._last_update = self.minimal_interval_seconds * MILISECONDS
+        self._update_start_time = ticks_ms() - 60 * MILISECONDS
+        self._update_span = 30
 
-        self.logger=logger
+        self.logger = logger
 
     def update(self, base_topic: str, current_time, current_value):
         if abs(ticks_diff(current_time, self._last_update)) < self.minimal_interval_seconds * MILISECONDS:
             return False
 
-        if abs(current_value - self._value) == 0:
-            return False
-
         if abs(current_value - self._value) < self.threshold_value:
+            self._update_start_time = None
             return False
+        else:
+            if self._update_start_time is None:
+                self._update_start_time = current_time
+
+            if abs(current_value - self._value) >= 2 * self.threshold_value:
+                pass
+            elif abs(ticks_diff(current_time, self._update_start_time)) < 60 * MILISECONDS:
+                # Ensure that this is real change not temporary breeze etc.
+                return False
 
         self._last_update = current_time
         self._value = current_value
+        self._update_start_time = None
 
         topic = f"{base_topic}/{self.topic}"
         message = self.format_data()
@@ -64,34 +73,9 @@ class Topic:
 class ADCTopic(Topic):
     def __init__(self, mqtt: BaseMqttClient, config, logger: Logger):
         super().__init__(mqtt, config, logger)
-        self._update_start_time = None
+        self._update_start_time = ticks_ms() - 60 * MILISECONDS
+        self._update_span = 60
 
-    def update(self, base_topic: str, current_time, current_value):
-        if abs(ticks_diff(current_time, self._last_update)) < self.minimal_interval_seconds * MILISECONDS:
-            return False
-
-        if abs(current_value - self._value) < self.threshold_value:
-            self._update_start_time = None
-            return False
-        else:
-            if self._update_start_time is None:
-                self._update_start_time = current_time
-
-            # Ensure that this is real change not temporary breeze etc.
-            if abs(ticks_diff(current_time, self._update_start_time)) < 60 * MILISECONDS:
-                return False
-
-        self._last_update = current_time
-        self._value = current_value
-        self._update_start_time = None
-
-        topic = f"{base_topic}/{self.topic}"
-        message = self.format_data()
-
-        self.mqtt.publish(topic, message)
-        self.logger.info(f"Published update on {topic}. Value: {self._value}.")
-
-        return True
 
 class Availability:
     def __init__(self, config):
@@ -118,6 +102,7 @@ class Device:
         self.base_topic = f"{self.config.type}/{self.config.name}/{self.config.id}"
         availability_topic = f"{self.base_topic}/{self.config.availability.topic}"
         self.mqtt.subscribe(availability_topic, self._availability_switch)
+        self._log_iterator = 0
 
     def _availability_switch(self, payload: str):
         if payload in ["on", "1"]:
@@ -149,19 +134,23 @@ class Device:
         raise NotImplementedError("Method not implemented")
 
     async def loop(self):
-        self.logger.debug(f"Starting loop for device with Id: {self.config.id}")
+        self.logger.info(f"Starting loop for device with Id: {self.config.id}")
         while True:
             try:
                 self.logger.debug(f"Starting update config.")
                 await self._update_config()
                 self.logger.debug(f"Finished update config.")
                 if self.config.availability.enabled:
+                    self._log_iterator += 1
+                    if self._log_iterator >= 20:
+                        self._log_iterator = 0
+                        self.logger.info(f"Sensor: {self.config.id} ({self.config.type}) is working.")
                     self.logger.debug(f"Starting internal loop.")
-                    await self._loop()
+                    await self._loop()  # Device sleeps in this loop
                     self.logger.debug(f"Finished internal loop.")
                 else:
-                    self.logger.info(f"Device {self.config.id} is disabled. Sleeping 500 ms.")
                     await uasyncio.sleep_ms(500)
             except Exception as e:
-                self.logger.error(f"Device loop failed: {e}")
+                self.logger.error(f"Device {self.config.id} ({self.config.type}) loop failed: {e}")
+
 

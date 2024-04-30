@@ -27,21 +27,15 @@ class InsolationSensor(Device):
         
         self.sensor = InsolationDriver(analog_accessor, channel)
 
-        
-
-
     async def _update_config(self):
         pass
 
     async def _loop(self):
-        self.logger.info(f"Internal loop of Insolation sensor.")
-       
         current_time = ticks_ms()
         await self.sensor.measure()
 
-        insolation = self.sensor.insolation()
+        insolation = 100 - self.sensor.insolation()
         self._insolation.update(self.base_topic, current_time, insolation)
-       
 
         self.logger.debug(f"Insolation: {insolation}.")
 

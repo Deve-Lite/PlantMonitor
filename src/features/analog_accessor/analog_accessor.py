@@ -5,6 +5,7 @@ from features.mqtt.mqtt import BaseMqttClient
 from machine import ADC, Pin
 
 import uasyncio
+import time
 
 
 class AnalogAccessorConfig:
@@ -35,8 +36,9 @@ class AnalogAccessor:
 
         try:
             await self.lock.acquire()
-
+            self.logger.debug(f"Mux access {time.ticks_ms()} {channel}")
             self._apply_idx(channel)
+            await uasyncio.sleep_ms(1)
             value = self.adc.read_u16()
             self.logger.debug(f"ADC value: {value}")
 
@@ -52,3 +54,4 @@ class AnalogAccessor:
         self.pins[1].value((channel >> 1) & 0x01)
         self.pins[2].value((channel >> 2) & 0x01)
         self.pins[3].value((channel >> 3) & 0x01)
+

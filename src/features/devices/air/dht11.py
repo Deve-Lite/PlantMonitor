@@ -98,14 +98,14 @@ class DHT11(Device):
             await uasyncio.sleep_ms(self.loop_span_ms)
             return
 
-        self.logger.info(f"Internal loop of dht11 sensor.")
         self._last_read = current_time
         self._sensor.measure()
 
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
-        self.logger.debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+        self.logger.debug(f"Temperature: {self._sensor.temperature()}")
+        self.logger.debug(f"Humidity: {self._sensor.humidity()}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

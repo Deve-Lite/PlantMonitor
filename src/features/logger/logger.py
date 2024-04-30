@@ -1,6 +1,7 @@
 from features.logger.logger_levels import LoggerLevels
 from features.logger.logger_levels import from_logger_level
 
+from utime import time
 
 class Logger:
     def __init__(self, debug: bool):
@@ -25,4 +26,4 @@ class Logger:
 
     @staticmethod
     def _format_message(level: LoggerLevels, message: str):
-        return f'{level} {from_logger_level(level)} {message}'
+        return f'{time()} {level} {from_logger_level(level)} {message}'

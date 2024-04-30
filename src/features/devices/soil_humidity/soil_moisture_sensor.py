@@ -32,9 +32,6 @@ class SoilMoistureSensor(Device):
         pass
 
     async def _loop(self):
-        self.logger.info(f"Internal loop of Soil moisture sensor.")
-        
-        
         current_time = ticks_ms()
         await self.sensor.measure()
 
