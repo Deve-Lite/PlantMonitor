@@ -1,4 +1,4 @@
-from features.devices.device import Device, DeviceConfig, Topic
+from features.devices.device import Device, DeviceConfig, ADCTopic
 from features.logger.logger import Logger
 from features.mqtt.mqtt import BaseMqttClient
 from utime import ticks_ms, ticks_diff, time
@@ -9,7 +9,7 @@ from drivers.sms import SMSDriver
 import uasyncio
 
 
-class Moisture(Topic):
+class Moisture(ADCTopic):
     pass
 
 
@@ -21,7 +21,7 @@ class SoilMoistureSensor(Device):
         super().__init__(mqtt, config, logger)
         data = config.config
 
-        self._moisture = Moisture(mqtt, data["moisture"])
+        self._moisture = Moisture(mqtt, data["moisture"], logger)
         self.loop_span_ms = data["loopSpanMs"]
         channel = data["channel"]
         self.sensor = SMSDriver(analog_accessor, channel)
@@ -32,16 +32,13 @@ class SoilMoistureSensor(Device):
         pass
 
     async def _loop(self):
-        self.logger.log_info(f"Internal loop of Soil moisture sensor.")
-        
-        
         current_time = ticks_ms()
         await self.sensor.measure()
 
         moisture = self.sensor.moisture()
 
         self._moisture.update(self.base_topic, current_time, moisture)
-        self.logger.log_debug(f"Moisture: {moisture}.")
+        self.logger.debug(f"Moisture: {moisture}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

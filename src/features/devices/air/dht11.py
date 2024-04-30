@@ -17,8 +17,7 @@ class Temperature(Topic):
                        "Celsius", "Fahrenheit", "Kelvin"]
 
     def __init__(self, mqtt: BaseMqttClient, config, logger: Logger):
-        super().__init__(mqtt, config)
-        self.logger = logger
+        super().__init__(mqtt, config, logger)
         self.unit_topic = config["unitTopic"]
 
     def update_unit(self, payload: str):
@@ -26,11 +25,11 @@ class Temperature(Topic):
         new_unit = collection["unit"]
 
         if new_unit not in self.AVAILABLE_UNITS:
-            self.logger.log_warning(f"Unit {new_unit} is not supported. Supported units: {self.AVAILABLE_UNITS}")
+            self.logger.warning(f"Unit {new_unit} is not supported. Supported units: {self.AVAILABLE_UNITS}")
             return
 
         self.unit = new_unit
-        self.logger.log_info(f"Unit changed to {new_unit}")
+        self.logger.info(f"Unit changed to {new_unit}")
 
     def format_data(self):
         value = self._convert_unit(self._value)
@@ -78,7 +77,7 @@ class DHT11(Device):
 
         self.data_pin = data["pin"]
         self._temperature = Temperature(mqtt, data["temperature"], logger)
-        self._humidity = Humidity(mqtt, data["humidity"])
+        self._humidity = Humidity(mqtt, data["humidity"], logger)
         self.loop_span_ms = data["loopSpanMs"]
 
         dht_pin = machine.Pin(self.data_pin, machine.Pin.IN, machine.Pin.PULL_UP)
@@ -99,14 +98,14 @@ class DHT11(Device):
             await uasyncio.sleep_ms(self.loop_span_ms)
             return
 
-        self.logger.log_info(f"Internal loop of dht11 sensor.")
         self._last_read = current_time
         self._sensor.measure()
 
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
-        self.logger.log_debug(f"Temperature: {self._sensor.temperature()}, humidity: {self._sensor.humidity()}.")
+        self.logger.debug(f"Temperature: {self._sensor.temperature()}")
+        self.logger.debug(f"Humidity: {self._sensor.humidity()}.")
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

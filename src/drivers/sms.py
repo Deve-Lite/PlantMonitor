@@ -15,6 +15,6 @@ class SMSDriver:
     def moisture(self):
         if self.moisture_val < 0:
             raise RuntimeError("moisture() method called before measure()")
-        return (self.moisture_val - self.min_moist) * 100 / (self.max_moist - self.min_moist)
+        return int((self.moisture_val - self.min_moist) * 100 / (self.max_moist - self.min_moist))
 
     

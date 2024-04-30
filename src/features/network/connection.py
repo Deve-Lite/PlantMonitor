@@ -26,9 +26,9 @@ class Connection:
         self.logger = logger
 
     def is_connected(self):
-        self.logger.log_debug("Fake. Connected to wifi.")
+        self.logger.debug("Fake. Connected to wifi.")
         return True
 
     def connect(self):
-        self.logger.log_debug("Fake. Connecting to wifi...")
+        self.logger.debug("Fake. Connecting to wifi...")
         return True
