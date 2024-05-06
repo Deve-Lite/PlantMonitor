@@ -61,6 +61,35 @@
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
+                    "value": 3,
+                    "minimalIntervalSeconds": 20
+                }
+            }
+        }
+    },
+
+    {
+        "id": "2",
+        "type": "soil",
+        "name": "gravity_v1",
+        "ground": 38,
+        "vcc": 36,
+        "availability": {
+            "enabled": true,
+            "topic": "availability"
+        },
+        "data":
+        {
+            "loopSpanMs": 500,
+            "mux_id": 1,
+            "channel": 15,
+            "moisture":
+            {
+                "unit": "Percentage",
+                "topic": "moisture",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
                     "value": 1,
                     "minimalIntervalSeconds": 20
                 }
