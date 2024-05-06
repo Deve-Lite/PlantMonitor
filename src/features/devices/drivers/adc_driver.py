@@ -12,16 +12,16 @@ class AnalogDriver:
         return await self.analog_accessor.read(self.channel)
 
     async def read(self):
+        return await self._read()
+
+    async def _read(self):
         raw = await self.read_raw()
 
-        if raw >= self.dry:
+        if raw <= self.min:
             return 0
-        if raw <= self.wet:
+        if raw >= self.max:
             return 100
 
-        calc = self._calculate(raw)
+        calc = int(raw / self.max * 100)
 
-        return min(100, max(0, int(calc)))
-
-    def _calculate(self, raw):
-        return raw / self.max * 100
+        return min(100, max(0, calc))

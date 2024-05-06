@@ -38,7 +38,6 @@
             }
         }
     },
-
     {
         "id": "2",
         "type": "soil",
@@ -67,9 +66,8 @@
             }
         }
     },
-
     {
-        "id": "2",
+        "id": "3",
         "type": "soil",
         "name": "gravity_v1",
         "ground": 38,
@@ -96,9 +94,8 @@
             }
         }
     },
-
     {
-        "id": "3",
+        "id": "4",
         "type": "light",
         "name": "is",
         "ground": 38,
@@ -110,8 +107,7 @@
         "data":
         {
             "loopSpanMs": 500,
-            "mux_id": 1,
-            "channel": 2,
+            "adcPin": 27,
             "insolation":
             {
                 "unit": "Percentage",

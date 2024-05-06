@@ -26,7 +26,7 @@ class DeviceFactory(MultiFactory):
             raise NotImplementedError("Air device is not supported")
 
         if config.type == "soil":
-            if config.name == "sms":
+            if config.name == "sms" or config.name == "gravity_v1":
 
                 mux_id = config.config["mux_id"]
                 accessor = self.find_analog_accessor(mux_id)
@@ -35,11 +35,7 @@ class DeviceFactory(MultiFactory):
 
         if config.type == "light":
             if config.name == "is":
-
-                mux_id = int(config.config["mux_id"])
-                accessor = self.find_analog_accessor(mux_id)
-
-                return InsolationSensor(self.client, config, self.logger, accessor)
+                return InsolationSensor(self.client, config, self.logger)
 
         raise NotImplementedError(f"Device {config.type}-{config.name} is not supported")
 

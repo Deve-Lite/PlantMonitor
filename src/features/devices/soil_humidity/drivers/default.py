@@ -10,5 +10,14 @@ class SMSDriver(AnalogDriver):
         self.mid = 33000
         self.dry = 63000
 
-    def _calculate(self, val):
-        return 1162.08 - 105.507 * log(val, e)
+    async def _read(self):
+        raw = await self.read_raw()
+
+        if raw >= self.dry:
+            return 0
+        if raw <= self.wet:
+            return 100
+
+        calc = int(1162.08 - 105.507 * log(raw, e))
+
+        return min(100, max(0, calc))
