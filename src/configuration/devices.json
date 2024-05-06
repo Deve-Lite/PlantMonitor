@@ -12,7 +12,7 @@
         "data":
         {
             "loopSpanMs": 500,
-            "pin": 1,
+            "pin": 16,
             "temperature":
             {
                 "unit": "Celsius",
@@ -22,7 +22,7 @@
                 "threshold":{
                     "type": "value",
                     "value": 0.2,
-                    "minimalIntervalSeconds": 20
+                    "minimalIntervalSeconds": 4
                 }
             },
             "humidity":
@@ -33,12 +33,11 @@
                 "threshold":{
                     "type": "value",
                     "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "minimalIntervalSeconds": 4
                 }
             }
         }
     },
-
     {
         "id": "2",
         "type": "soil",
@@ -61,15 +60,42 @@
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
-                    "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "value": 5,
+                    "minimalIntervalSeconds": 5
                 }
             }
         }
     },
-
     {
         "id": "3",
+        "type": "soil",
+        "name": "gravity_v1",
+        "ground": 38,
+        "vcc": 36,
+        "availability": {
+            "enabled": true,
+            "topic": "availability"
+        },
+        "data":
+        {
+            "loopSpanMs": 500,
+            "mux_id": 1,
+            "channel": 15,
+            "moisture":
+            {
+                "unit": "Percentage",
+                "topic": "moisture",
+                "sendAsJson": true,
+                "threshold":{
+                    "type": "value",
+                    "value": 1,
+                    "minimalIntervalSeconds": 5
+                }
+            }
+        }
+    },
+    {
+        "id": "4",
         "type": "light",
         "name": "is",
         "ground": 38,
@@ -81,8 +107,7 @@
         "data":
         {
             "loopSpanMs": 500,
-            "mux_id": 1,
-            "channel": 2,
+            "adcPin": 27,
             "insolation":
             {
                 "unit": "Percentage",
@@ -90,10 +115,11 @@
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
-                    "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "value": 4,
+                    "minimalIntervalSeconds": 5
                 }
             }
         }
     }
 ]
+

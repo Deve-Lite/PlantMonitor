@@ -7,7 +7,7 @@ from application import App
 from features.analog_accessor.analog_accessor_factory import AnalogAccessorFactory
 from features.devices.device_factory import DeviceFactory
 from features.logger.file_logger import FileLogger
-from features.logger.logger_levels import LoggerLevels
+from features.logger.logger import Logger
 from features.mqtt.mqtt_factory import MqttFactory
 from features.network.connection_factory import ConnectionFactory
 
@@ -17,9 +17,9 @@ from machine import reset
 
 def setup_fail(logger: Logger, message: str, error_code: int):
     logger.error(message)
+    logger.error(str(error_code))
     sleep(5)
-    sys.exit(error_code)
-    # in release change to reset()
+    reset()
 
 
 if __name__ == '__main__':

@@ -19,7 +19,6 @@ class MqttConfiguration(Configuration):
         self.client = json.get("client")
         self.ssl = json.get("ssl", True)
         self.keep_alive = self.value_in_range(name="keepAlive", min_v=10, max_v=120)
-        self.refresh_rate_ms = self.value_in_range(name="refreshRateMs", min_v=100, max_v=10000)
 
 
 class BaseMqttClient:
