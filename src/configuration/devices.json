@@ -12,7 +12,7 @@
         "data":
         {
             "loopSpanMs": 500,
-            "pin": 1,
+            "pin": 16,
             "temperature":
             {
                 "unit": "Celsius",
@@ -22,7 +22,7 @@
                 "threshold":{
                     "type": "value",
                     "value": 0.2,
-                    "minimalIntervalSeconds": 20
+                    "minimalIntervalSeconds": 4
                 }
             },
             "humidity":
@@ -33,7 +33,7 @@
                 "threshold":{
                     "type": "value",
                     "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "minimalIntervalSeconds": 4
                 }
             }
         }
@@ -60,8 +60,8 @@
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
-                    "value": 3,
-                    "minimalIntervalSeconds": 20
+                    "value": 5,
+                    "minimalIntervalSeconds": 5
                 }
             }
         }
@@ -89,7 +89,7 @@
                 "threshold":{
                     "type": "value",
                     "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "minimalIntervalSeconds": 5
                 }
             }
         }
@@ -115,10 +115,11 @@
                 "sendAsJson": true,
                 "threshold":{
                     "type": "value",
-                    "value": 1,
-                    "minimalIntervalSeconds": 20
+                    "value": 4,
+                    "minimalIntervalSeconds": 5
                 }
             }
         }
     }
 ]
+
