@@ -471,15 +471,23 @@ In contrast to sms sensors this sensor should be on separate adc pin (raspberry 
 
 3D model can be found at [thingiverse Plant Monitor]().
 
-### Wiring Schema for Example Configuration
+### Example of wiring schema
 
-TBA.
+Example schema introduces device configuration for retriving key informations about single plant.
+
+Involved devices:
+- dht11 sensor
+- adc multiplexer (other pins than in example configuration)
+- one SMS sensor
+- insolation sensor
+
+![wiring](./BasicSchematic.png)
 
 ### Setup
 
 1. Place contents of `src` folder in raspbery pi pico w.
 2. Provide `wifi` configuration.
-3. Provide `mqtt` configuration.
+3. Provide `mqtt` configuration (you can use [HiveMq](https://auth.hivemq.cloud/) as a cloud broker).
 4. Provide `devices` and `accessors` configurations.
 5. You can run project using thonny in order to test working.
 6. Finaly device will run when connecting to power source.
@@ -491,3 +499,22 @@ If you want to see console logging change:
 to
 
 `logger = FileLogger(console=True, debug=False)`
+
+### Contribution / Development
+
+#### New Device Type
+
+In order to add new device type (for example rain sernsors) we should create new folder in `src/features/devices` with name as category of devices.
+Then we have to prepare class that will implement `Device` class also we should be aware to implement default driver for this category.
+(When we have 2 devices that communicate with different protocols we may want to create a sperate class that implements `Device`)
+Finally we have to add our device type to `device_factory.py`.
+
+#### New Device For Existing Device Type
+
+A. Differend communication model
+In order to add new device model (example dht22) we navigate to device category (`src/features/devices/air`), inside category folder we should provide new implementation of `Device` class with apporoperiet driver.
+
+B. Same communuication model
+
+When devices uses similar communication model we can only provide driver for sepcific modules. 
+You can find example in `src/features/devices/soil_humidity`.
