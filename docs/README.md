@@ -518,3 +518,7 @@ B. Same communuication model
 
 When devices uses similar communication model we can only provide driver for sepcific modules. 
 You can find example in `src/features/devices/soil_humidity`.
+
+#### Accessing other devices data
+
+This can be done via Mqtt implementation clas via `get_values` method, we just have to know topics of the devices / or how topic starts and then we can access whole group of devices (`get_values("{base_device_topic}/soil")` will return all informations that are send by soil moisture sensors)
