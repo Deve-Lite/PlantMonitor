@@ -8,6 +8,8 @@ from features.devices.light.drivers.default import InsolationDriver
 import uasyncio
 
 
+from features.UI.LCD.lcd import MyLCD
+
 class Insolation(ADCTopic):
     pass
 
@@ -15,7 +17,8 @@ class Insolation(ADCTopic):
 class InsolationSensor(Device):
     def __init__(self, mqtt: BaseMqttClient,
                  config: DeviceConfig,
-                 logger: Logger):
+                 logger: Logger,
+                 lcd: MyLCD):
         super().__init__(mqtt, config, logger)
         data = config.config
 
@@ -24,6 +27,8 @@ class InsolationSensor(Device):
         pin = data["adcPin"]
         
         self.sensor = InsolationDriver(pin)
+        self.lcd = lcd
+        self._insolation_unit = data["insolation"]["unit"]
 
     async def _update_config(self):
         pass
@@ -31,6 +36,10 @@ class InsolationSensor(Device):
     async def _loop(self):
         current_time = ticks_ms()
         insolation = await self.sensor.read()
+
+        if self.get_lcd_status() is True:
+            self.lcd.print_values(insolation, self._insolation_unit)
+            
 
         self._insolation.update(self.base_topic, current_time, insolation)
         self.logger.debug(f"Insolation: {insolation}.")

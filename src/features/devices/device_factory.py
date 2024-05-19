@@ -34,11 +34,11 @@ class DeviceFactory(MultiFactory):
                 mux_id = config.config["mux_id"]
                 accessor = self.find_analog_accessor(mux_id)
 
-                return SoilMoistureSensor(self.client, config, self.logger, accessor)
+                return SoilMoistureSensor(self.client, config, self.logger, accessor, self.lcd)
 
         if config.type == "light":
             if config.name == "is":
-                return InsolationSensor(self.client, config, self.logger)
+                return InsolationSensor(self.client, config, self.logger, self.lcd)
 
         raise NotImplementedError(f"Device {config.type}-{config.name} is not supported")
 
