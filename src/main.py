@@ -76,7 +76,7 @@ if __name__ == '__main__':
         lcd = lcd_factory.create()
         
 
-        device_factory = DeviceFactory(mqtt, accessors, logger, lcd)
+        device_factory = DeviceFactory(mqtt, accessors, logger)
         devices = device_factory.create()
 
         ui = UI(encoder, lcd, devices)

@@ -7,7 +7,6 @@ import machine
 import dht
 import uasyncio
 
-from features.UI.LCD.lcd import MyLCD
 
 class Humidity(Topic):
     pass
@@ -72,15 +71,14 @@ class DHT11(Device):
 
     def __init__(self, mqtt: BaseMqttClient,
                  config: DeviceConfig,
-                 logger: Logger,
-                 lcd: MyLCD):
+                 logger: Logger):
         super().__init__(mqtt, config, logger)
         data = config.config
 
         self.data_pin = data["pin"]
         self._temperature = Temperature(mqtt, data["temperature"], logger)
         self._humidity = Humidity(mqtt, data["humidity"], logger)
-        self.loop_span_ms = data["loopSpanMs"]
+        self._loop_span_ms = data["loopSpanMs"]
 
         dht_pin = machine.Pin(self.data_pin, machine.Pin.IN, machine.Pin.PULL_UP)
         self._sensor = dht.DHT11(dht_pin)
@@ -90,9 +88,8 @@ class DHT11(Device):
         unit_topic = f"{self.base_topic}/{self._temperature.topic}/{self._temperature.unit_topic}"
         self.mqtt.subscribe(unit_topic, self._temperature.update_unit)
         
-        self.lcd = lcd
-        self.temp_unit = data["temperature"]["unit"]
-        self.hum_unit = data["humidity"]["unit"]
+        self._temp_unit = data["temperature"]["unit"]
+        self._hum_unit = data["humidity"]["unit"]
 
 
     async def _update_config(self):
@@ -102,15 +99,17 @@ class DHT11(Device):
         current_time = ticks_ms()
 
         if abs(ticks_diff(current_time, self._last_read)) < DHT11.DHT_READ_SPAN:
-            await uasyncio.sleep_ms(self.loop_span_ms)
+            await uasyncio.sleep_ms(self._loop_span_ms)
             return
 
         self._last_read = current_time
     
         
         self._sensor.measure()
-        if self.get_lcd_status() is True:
-            self.lcd.print_values(self._sensor.temperature(), self.temp_unit, self._sensor.humidity(), self.hum_unit)
+
+        # Would be better if UI has full control over data it displays
+        #if self.get_lcd_status() is True:
+        #   self.lcd.print_values(self._sensor.temperature(), self.temp_unit, self._sensor.humidity(), self.hum_unit)
             
             
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
@@ -122,6 +121,16 @@ class DHT11(Device):
         
         
 
-        await uasyncio.sleep_ms(self.loop_span_ms)
+        await uasyncio.sleep_ms(self._loop_span_ms)
 
+
+    # For dynamic updates in UI
+
+    async def get_temperature(self):
+        return self._sensor.temperature(), self._temp_unit
+    
+    async def get_humidity(self):
+        return self._sensor.humidity(), self._hum_unit
+
+        
 

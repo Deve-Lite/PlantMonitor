@@ -1,7 +1,10 @@
 from abstractions.factory import Factory
-from logger.logger import Logger
-from UI.Encoder.encoder import EncoderConfig
-from UI.Encoder.encoder import RotaryEncoder
+
+from features.UI.Encoder.encoder import EncoderConfig
+from features.UI.Encoder.encoder import RotaryEncoder
+
+
+from features.logger.logger import Logger
 
 class EncoderFactory(Factory):
     def __init__(self, logger: Logger = None):

@@ -6,7 +6,7 @@ from abstractions.configuration import Configuration
 class MyLCDConfig:
     def __init__(self, config):
         config = config["lcd"]
-        self.i2c_addr = config["i2c_addr"]
+        self.i2c_addr = int(config["i2c_addr"],16)
         self.rows = config["rows"]
         self.cols = config["cols"]
         self.buff_size = config["buff_size"]
@@ -58,6 +58,8 @@ class MyLCD:
     def clear(self):
         self.lcd.clear()
         
+
+    # prints values Probably TO be changed
     def print_values(self, *args):
         values = []
         units = []
