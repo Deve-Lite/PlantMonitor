@@ -6,23 +6,26 @@ from features.devices.light.insolation_sensor import InsolationSensor
 from features.devices.soil_humidity.soil_moisture_sensor import SoilMoistureSensor
 from features.devices.device import DeviceConfig
 from features.mqtt.mqtt import BaseMqttClient
+from features.UI.LCD.lcd import MyLCD
 
 
 
 class DeviceFactory(MultiFactory):
-    def __init__(self, client: BaseMqttClient, analog_accessors: [], logger: Logger):
+    def __init__(self, client: BaseMqttClient, analog_accessors: [], logger: Logger, lcd: MyLCD):
         super().__init__("devices", logger)
         self.logger = logger
         self.client = client
         self.analog_accessors = analog_accessors
         self.max_items = 48
+        
+        self.lcd = lcd
 
     def _create_item(self, config):
         config = DeviceConfig(config)
 
         if config.type == "air":
             if config.name == "dht11":
-                return DHT11(self.client, config, self.logger)
+                return DHT11(self.client, config, self.logger, self.lcd)
             raise NotImplementedError("Air device is not supported")
 
         if config.type == "soil":
@@ -44,5 +47,4 @@ class DeviceFactory(MultiFactory):
             if int(accessor.config.id) == mux_id:
                 return accessor
         
-        print("HEEEEEJ")
         raise ValueError(f"There isn't any analog accessor with id {mux_id}")

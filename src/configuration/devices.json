@@ -12,7 +12,7 @@
         "data":
         {
             "loopSpanMs": 500,
-            "pin": 16,
+            "pin": 1,
             "temperature":
             {
                 "unit": "Celsius",

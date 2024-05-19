@@ -7,6 +7,7 @@ import machine
 import dht
 import uasyncio
 
+from features.UI.LCD.lcd import MyLCD
 
 class Humidity(Topic):
     pass
@@ -71,7 +72,8 @@ class DHT11(Device):
 
     def __init__(self, mqtt: BaseMqttClient,
                  config: DeviceConfig,
-                 logger: Logger):
+                 logger: Logger,
+                 lcd: MyLCD):
         super().__init__(mqtt, config, logger)
         data = config.config
 
@@ -87,6 +89,11 @@ class DHT11(Device):
 
         unit_topic = f"{self.base_topic}/{self._temperature.topic}/{self._temperature.unit_topic}"
         self.mqtt.subscribe(unit_topic, self._temperature.update_unit)
+        
+        self.lcd = lcd
+        self.temp_unit = data["temperature"]["unit"]
+        self.hum_unit = data["humidity"]["unit"]
+
 
     async def _update_config(self):
         pass
@@ -99,13 +106,21 @@ class DHT11(Device):
             return
 
         self._last_read = current_time
+    
+        
         self._sensor.measure()
-
+        if self.get_lcd_status() is True:
+            self.lcd.print_values(self._sensor.temperature(), self.temp_unit, self._sensor.humidity(), self.hum_unit)
+            
+            
         self._temperature.update(self.base_topic, current_time, self._sensor.temperature())
         self._humidity.update(self.base_topic, current_time, self._sensor.humidity())
 
         self.logger.debug(f"Temperature: {self._sensor.temperature()}")
         self.logger.debug(f"Humidity: {self._sensor.humidity()}.")
+        
+        
+        
 
         await uasyncio.sleep_ms(self.loop_span_ms)
 

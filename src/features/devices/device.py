@@ -3,6 +3,7 @@ from features.mqtt.mqtt import BaseMqttClient
 from utime import ticks_ms, ticks_diff, time
 from ujson import dumps, loads
 import uasyncio
+import _thread
 
 MILISECONDS = 1000
 
@@ -103,6 +104,9 @@ class Device:
         availability_topic = f"{self.base_topic}/{self.config.availability.topic}"
         self.mqtt.subscribe(availability_topic, self._availability_switch)
         self._log_iterator = 0
+        
+        self._lcd_lock = _thread.allocate_lock()
+        self._lcd_enabled = False
 
     def _availability_switch(self, payload: str):
         if payload in ["on", "1"]:
@@ -125,6 +129,18 @@ class Device:
 
         if value in ["off", "0"]:
             self.config.availability.enabled = False
+    
+    def enable_lcd(self):
+        with self._lcd_lock:
+            self._lcd_enabled = True
+    
+    def disable_lcd(self):
+        with self._lcd_lock:
+            self._lcd_enabled = False
+
+    def get_lcd_status(self):
+        with self._lcd_lock:
+            return self._lcd_enabled
 
     async def _loop(self):
         raise NotImplementedError("Method not implemented")
