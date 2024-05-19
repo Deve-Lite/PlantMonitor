@@ -1,0 +1,18 @@
+{
+    "encoder": 
+    {
+        "clk": 15,
+        "dt": 14,
+        "min_val": 0,
+        "sw": 16
+    },
+    "lcd":
+    {
+        "i2c_addr": "0x27",
+        "rows": 2,
+        "cols": 16,
+        "buff_size": 40,
+        "scl_pin": 5,
+        "sda_pin": 4
+    }
+}

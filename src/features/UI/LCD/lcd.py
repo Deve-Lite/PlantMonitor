@@ -1,19 +1,26 @@
 from lcd_i2c import LCD
 from machine import I2C, Pin
 import uasyncio
+from abstractions.configuration import Configuration
 
-
+class MyLCDConfig:
+    def __init__(self, config):
+        config = config["lcd"]
+        self.i2c_addr = config["i2c_addr"]
+        self.rows = config["rows"]
+        self.cols = config["cols"]
+        self.buff_size = config["buff_size"]
+        self.sda = config["sda_pin"]
+        self.scl = config["scl_pin"]
 
 class MyLCD:
-    def __init__(self, i2c_addr=0x27, rows=2, cols=16, buff_s=40 , scl_pin=5, sda_pin=4):
-        self.cols = cols
-        self.rows = rows
-        self.buff_s = buff_s
-        self.hidden_cols = buff_s - cols
+    def __init__(self, config: MyLCDConfig):
+        self.config = config
+        self.hidden_cols = config.buff_size - config.cols
         
         
-        i2c = I2C(0, scl=Pin(scl_pin), sda=Pin(sda_pin), freq=800000)
-        self.lcd = LCD(addr=i2c_addr, cols=cols, rows=rows,i2c=i2c)
+        i2c = I2C(0, scl=Pin(config.scl), sda=Pin(config.sda), freq=800000)
+        self.lcd = LCD(addr=config.i2c_addr, cols=config.cols, rows=config.rows,i2c=i2c)
         
         self.lcd.begin()
         self.lcd.home()
@@ -21,14 +28,14 @@ class MyLCD:
         
     def split_text(self, text, prefix="", postfix=""):
         text = text.replace('\n', ' ')  # for multiline strings
-        text = self.cols * prefix + text + self.cols * postfix
+        text = self.config.cols * prefix + text + self.config.cols * postfix
         
         fragments = []
         last_n = ""
         for i in range(0, len(text), self.hidden_cols):
             fragment = last_n + text[i:i+ self.hidden_cols]
             fragments.append(fragment)
-            last_n = fragment[-self.cols:]
+            last_n = fragment[-self.config.cols:]
 
         return fragments
 
@@ -40,7 +47,7 @@ class MyLCD:
         for fragment in fragments:
             self.lcd.home()
             self.lcd.print(fragment)
-            for _ in range(min(len(fragment) - self.cols, self.hidden_cols)):
+            for _ in range(min(len(fragment) - self.config.cols, self.hidden_cols)):
                 self.lcd.scroll_display_left()
                 await uasyncio.sleep(interval)
         

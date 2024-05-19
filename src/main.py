@@ -14,6 +14,9 @@ from features.UI.Encoder.encoder import RotaryEncoder
 from features.UI.ui import UI
 from features.UI.LCD.lcd import MyLCD
 
+from features.UI.Encoder.encoder_factory import EncoderFactory
+from features.UI.LCD.lcd_factory import MyLCDFactory
+
 from utime import sleep, localtime, gmtime
 from machine import reset, Pin
 
@@ -63,9 +66,14 @@ if __name__ == '__main__':
         accessor_factory = AnalogAccessorFactory(logger)
         accessors = accessor_factory.create()
 
-        encoder = RotaryEncoder()
-        lcd = MyLCD()
-        
+
+
+
+        encoder_factory = EncoderFactory(logger)
+        encoder = encoder_factory.create()
+
+        lcd_factory = MyLCDFactory(logger)
+        lcd = lcd_factory.create()
         
 
         device_factory = DeviceFactory(mqtt, accessors, logger, lcd)
@@ -73,10 +81,7 @@ if __name__ == '__main__':
 
         ui = UI(encoder, lcd, devices)
 
-        # TODO ui config
-
-       
-
+        
 
         blink(led, 4)
         app = App(mqtt, devices, logger, ui)
