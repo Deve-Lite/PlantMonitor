@@ -1,0 +1,36 @@
+{
+    "dht": {
+        "pin": 0,
+        "version": "dht22",
+        "topic": "dht",
+        "temperature": {
+            "min_interval": 10000,
+            "threshold": 0.2,
+            "topic": "temperature"
+        },
+        "humidity": {
+            "min_interval": 10000,
+            "threshold": 4,
+            "topic": "humidity"
+        }
+    },
+    "humidity": {
+        "pin": 0,
+        "threshold": 4,
+        "min_interval": 10000
+    },
+    "network": {
+        "ssid": "your_wifi_ssid",
+        "password": "your_wifi_password"
+    },
+    "mqtt": {
+        "server": "your_mqtt_server",
+        "port": 8883,
+        "client": "your_client_id",
+        "ssl": true,
+        "keepAlive": 60,
+        "username": "your_mqtt_user",
+        "password": "your_mqtt_password",
+        "baseTopic": "plantMonitor/"
+    }
+}

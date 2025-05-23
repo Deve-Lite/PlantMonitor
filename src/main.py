@@ -1,68 +1,82 @@
 import gc
-import uasyncio
+import asyncio
 import ntptime
-
+import json
 from application import App
-from features.analog_accessor.analog_accessor_factory import AnalogAccessorFactory
-from features.devices.device_factory import DeviceFactory
-from features.logger.file_logger import FileLogger, Logger
-from features.mqtt.mqtt_factory import MqttFactory
-from features.network.connection_factory import ConnectionFactory
+from logger.logger import Logger
+from time import gmtime
+from machine import Pin, reset
+from utils.network import setup_network
+from utils.utils import blink
 
-from utime import sleep, localtime, gmtime
-from machine import reset, Pin
+DEBUG = True
+LED_PIN = 8
+SETTINGS_FILE = 'appsettings.json'
 
+def list_networks(self):
+    wlan = network.WLAN(network.STA_IF)
+    networks = wlan.scan()
 
-def setup_fail(logger: Logger, message: str):
-    logger.error(message)
-    sleep(5)
-    reset()
+    self.logger.debug("Networks found: {}".format(len(networks)))
+    self.logger.debug("-------------------------------------------")
+    for wlan in networks:
+        self.logger.debug("SSID: {}".format(wlan[0].decode('utf-8')))
+        self.logger.debug("BSSID: {}".format(':'.join(['%02x' % b for b in wlan[1]])))
+        self.logger.debug("Channel: {}".format(wlan[2]))
+        self.logger.debug("RSSI: {}".format(wlan[3]))
+        self.logger.debug("Authmode: {}".format(wlan[4]))
+        self.logger.debug("Hidden: {}".format(wlan[5]))
+        self.logger.debug("-------------------------------------------")
 
-
-def blink(led, n=1):
-    for i in range(n):
-        led.value(1)
-        sleep(0.2)
-        led.value(0)
-        sleep(0.2)
-
-
-if __name__ == '__main__':
+async def main():
+    logger = Logger(DEBUG)
     try:
         gc.collect()
 
-        logger = FileLogger(console=False, debug=False)
-        logger.info("Device starting")
-        led = Pin(25, Pin.OUT)
-        led.value(0)
-        sleep(1)
+        logger.info('Initializing device.')
 
-        blink(led, 1)
-        connection = ConnectionFactory(logger).create()
-        connection_result = connection.connect()
-        if not connection_result:
-            setup_fail(logger, f"Failed to connect with {connection.config.type}.", 1)
+        logger.debug(f"Free memory: {gc.mem_free()} bytes.")
+        gc.collect()
+        logger.debug(f"Free memory after collect: {gc.mem_free()} bytes.")
+        
+        led = Pin(LED_PIN, Pin.OUT)
+        led.value(0)
+        await asyncio.sleep_ms(500)
+        await blink(led, 1)
+        
+        logger.info('Initializing Networn and Mqtt.')
+        with open(SETTINGS_FILE) as f:
+            config = json.load(f)
+        
+        mqtt_client = setup_network(config, logger)
+        await blink(led, 1)
 
         logger.info("Synchronizing time with ntptime module")
-        blink(led, 2)
         ntptime.settime()
         logger.info(f"Global time: {gmtime()}")
+        await blink(led, 1)
 
-        blink(led, 3)
-        mqtt = MqttFactory(logger).create()
-        mqtt_connection_result = mqtt.connect()
-
-        if not mqtt_connection_result:
-            setup_fail(logger, f"Failed to connect with {mqtt.config.type}.", 2)
-
-        accessor_factory = AnalogAccessorFactory(logger)
-        accessors = accessor_factory.create()
-
-        device_factory = DeviceFactory(mqtt, accessors, logger)
-        devices = device_factory.create()
-
-        blink(led, 4)
-        app = App(mqtt, devices, logger)
-        uasyncio.run(app.start())
+        app = App(mqtt_client, logger, config)
+        
+        await app.start()
+        
+        logger.error("Application exited.")
+        await blink(led, 5)
+        await asyncio.sleep(1)
+        
     except Exception as e:
-        setup_fail(logger, str(e), 2)
+        logger.error("Failed to start the application.")
+        await blink(led, 5)
+        await asyncio.sleep(1)
+        
+        
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except:
+        logger = Logger(DEBUG)
+        logger.error("Failed to start the application.")
+    finally:
+        asyncio.new_event_loop()
+        if not DEBUG:
+            reset()

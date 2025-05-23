@@ -1,7 +1,7 @@
-from features.logger.logger_levels import LoggerLevels
-from features.logger.logger_levels import from_logger_level
+from logger.logger_levels import LoggerLevels
+from logger.logger_levels import from_logger_level
 
-from utime import time
+from time import time
 
 class Logger:
     def __init__(self, debug: bool):
