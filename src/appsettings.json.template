@@ -1,6 +1,6 @@
 {
     "dht": {
-        "pin": 0,
+        "pin": 2,
         "version": "dht22",
         "topic": "dht",
         "temperature": {
@@ -10,14 +10,18 @@
         },
         "humidity": {
             "min_interval": 10000,
-            "threshold": 4,
+            "threshold": 1,
             "topic": "humidity"
         }
     },
     "humidity": {
         "pin": 0,
-        "threshold": 4,
-        "min_interval": 10000
+        "topic": "soil",
+        "humidity": {
+            "min_interval": 10000,
+            "threshold": 3,
+            "topic": "humidity"
+        }
     },
     "network": {
         "ssid": "your_wifi_ssid",
