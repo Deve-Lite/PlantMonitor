@@ -1,6 +1,0 @@
-{
-  "type": "wifi/none",
-  "ssid": "your_ssid",
-  "password": "your_password",
-  "maxConnectionTime": 15
-}
