@@ -43,6 +43,9 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
             send_temp = False
             send_hum = False
             send_dht = False
+            
+            async with lock:
+                now = time.time() * 1000  # ms timestamp
 
             # Check temperature
             if (last_temp is None or
@@ -63,8 +66,6 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
                 send_dht = True
 
             async with lock:
-                now = time.time() * 1000  # ms timestamp
-                
                 if send_temp:
                     await mqtt.publish(topic_temp, str(temperature))
                     logger.info("Published temperature: {}".format(temperature))
@@ -85,7 +86,7 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
         except Exception as e:
             logger.error("Error reading DHT sensor: {}".format(e))
 
-        await asyncio.sleep_ms(1000)
+        await asyncio.sleep_ms(7500)
         
 
 async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configuration: dict):
@@ -118,7 +119,8 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
                 humidity_percent = int((1 - (raw_value / 3500)) * 100)
                 humidity_percent = max(0, min(100, humidity_percent))
 
-            now = time.time() * 1000  # ms timestamp
+            async with lock:
+                now = time.time() * 1000  # ms timestamp
 
             send_hum = (
                 last_hum is None or
@@ -144,22 +146,22 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
         except Exception as e:
             logger.error(f"Error reading soil humidity sensor: {e}")
 
-        await asyncio.sleep_ms(1000)
+        await asyncio.sleep_ms(5000)
 
 
-async def disconnection_worker(self, logger: Logger, mqtt: MQTTClient):
+async def disconnection_worker(logger: Logger, mqtt: MQTTClient):
     logger.info("Starting mqtt disconnection worker.")
     
     try:
         while True:
-            await self._client.down.wait()
-            self._client.down.clear()
+            await mqtt.down.wait()
+            mqtt.down.clear()
             logger.error("Wifi or broker connection is down.")
     except Exception as e:
         logger.error(f"Error in disconnection worker: {e}")
 
-async def connection_worker(self, logger: Logger, mqtt: MQTTClient):
-    self.logger.info("Starting mqtt connection worker.")
+async def connection_worker(logger: Logger, mqtt: MQTTClient):
+    logger.info("Starting mqtt connection worker.")
     try:
         while True:
             await mqtt.up.wait()
@@ -177,17 +179,18 @@ class App:
 
     async def start(self):
         
-        self._logger.debug(f"Starting dht loop: {len(self._devices)}")
+        self._logger.debug(f"Starting dht loop.")
         message = asyncio.create_task(dht_loop(self._logger, self._mqtt, self._lock, self._configuration))
 
-        self._logger.debug(f"Starting soil humidity loop: {len(self._devices)}")
+        self._logger.debug(f"Starting soil humidity loop.")
         device = asyncio.create_task(soil_humidity_loop(self._logger, self._mqtt, self._lock, self._configuration))
 
-        self._logger.debug(f"Starting disconnection worker: {len(self._devices)}")
-        disconnection = asyncio.create_task(disconnection_worker(self._mqtt, self._logger))
+        self._logger.debug(f"Starting disconnection worker.")
+        disconnection = asyncio.create_task(disconnection_worker(self._logger, self._mqtt))
         
-        self._logger.debug(f"Starting connection worker: {len(self._devices)}")
-        connection = asyncio.create_task(connection_worker(self._mqtt, self._logger))
+        self._logger.debug(f"Starting connection worker.")
+        connection = asyncio.create_task(connection_worker(self._logger, self._mqtt))
 
         await asyncio.gather(message, device, disconnection, connection)
+
 

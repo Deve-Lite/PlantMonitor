@@ -35,6 +35,6 @@
         "keepAlive": 60,
         "username": "your_mqtt_user",
         "password": "your_mqtt_password",
-        "baseTopic": "plantMonitor/"
+        "baseTopic": "plantMonitor"
     }
 }

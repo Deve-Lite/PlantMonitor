@@ -5,12 +5,19 @@ def setup_network(configuration: dict, logger: Logger):
     
     logger.debug(f"MQTT options: {configuration["mqtt"]["username"]}, {configuration["mqtt"]["password"]}, {configuration["mqtt"]["server"]}")
 
+    config['server'] = configuration["mqtt"]["server"]
+    config['port'] = configuration["mqtt"]["port"]
+    
+    config['client_id'] = configuration["mqtt"]["clientId"]
     config['user'] = configuration["mqtt"]["username"]
     config['password'] = configuration["mqtt"]["password"]
-    config['server'] = configuration["mqtt"]["server"]
+    
     config['ssl'] = configuration["mqtt"]["ssl"]
     config['ssl_params'] = {"server_hostname": configuration["mqtt"]["server"] }
+    
     config["queue_len"] = 1
+    config['clean'] = True
+    config['keepalive'] = configuration["mqtt"]["keepAlive"]
     
     logger.debug(f"Wifi options: {configuration["network"]["ssid"]}, {configuration["network"]["password"]}")
 
