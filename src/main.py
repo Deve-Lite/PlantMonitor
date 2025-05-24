@@ -10,6 +10,7 @@ from machine import Pin, reset
 from utils.network import setup_network
 from utils.utils import blink
 
+LOG = True
 DEBUG = True
 LED_PIN = 8
 SETTINGS_FILE = 'appsettings.json'
@@ -31,7 +32,7 @@ def list_networks(logger):
         logger.debug("-------------------------------------------")
 
 async def main():
-    logger = Logger(DEBUG)
+    logger = Logger(DEBUG, LOG)
     try:
         gc.collect()
 
@@ -83,9 +84,10 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except:
-        logger = Logger(DEBUG)
+        logger = Logger(DEBUG, LOG)
         logger.error("Failed to start the application.")
     finally:
         asyncio.new_event_loop()
         if not DEBUG:
             reset()
+ 

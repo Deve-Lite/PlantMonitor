@@ -1,6 +1,7 @@
 import asyncio
 import dht
 import time
+import sys
 from logger.logger import Logger
 from mqtt_as import MQTTClient
 from machine import Pin, ADC
@@ -18,6 +19,7 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
     temp_min_interval = cfg["temperature"]["min_interval"]
     hum_threshold = cfg["humidity"]["threshold"]
     hum_min_interval = cfg["humidity"]["min_interval"]
+    sleep_ms = cfg["sleep"]
 
     logger.info(f"Dht topic: {topic_dht}")
     logger.info(f"Dht temp. topic: {topic_temp}")
@@ -86,7 +88,7 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
         except Exception as e:
             logger.error("Error reading DHT sensor: {}".format(e))
 
-        await asyncio.sleep_ms(7500)
+        await asyncio.sleep_ms(sleep_ms)
         
 
 async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configuration: dict):
@@ -98,29 +100,38 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
     topic_hum = f"{base_topic}/{cfg['topic']}/{cfg['humidity']['topic']}"
     hum_threshold = cfg["humidity"]["threshold"]
     hum_min_interval = cfg["humidity"]["min_interval"]
+    sleep_ms = cfg["sleep"]
 
     logger.info(f"Soil humidity topic: {topic_soil}")
     logger.info(f"Soil humidity sensor topic: {topic_hum}")
 
     adc = ADC(Pin(pin))
-    adc.atten(ADC.ATTN_11DB)  # Configure ADC for max range (0-3.3V)
+
+    # Detect platform and set ADC range
+    if sys.platform == "rp2":
+        max_adc = 65535  # 16-bit for RP2040
+    elif sys.platform == "esp32":
+        adc.atten(ADC.ATTN_11DB)  # Configure full range
+        max_adc = 4095  # 12-bit for ESP32
+    else:
+        max_adc = 4095  # Default to 12-bit
 
     last_hum = None
     last_hum_time = 0
 
     while True:
         try:
-            raw_value = adc.read()
-            # Map ADC reading (0-4095) to soil moisture %
-            # >=3500 ADC reading means 0% humidity (dry)
-            if raw_value >= 3500:
+            raw_value = adc.read_u16() if sys.platform == "rp2" else adc.read()
+            norm = raw_value / max_adc
+
+            # Apply custom logic: dry if above ~85% of max
+            if norm >= 3500 / 4095:
                 humidity_percent = 0
             else:
-                humidity_percent = int((1 - (raw_value / 3500)) * 100)
+                humidity_percent = int((1 - (norm / (3500 / 4095))) * 100)
                 humidity_percent = max(0, min(100, humidity_percent))
 
-            async with lock:
-                now = time.time() * 1000  # ms timestamp
+            now = time.time() * 1000  # ms timestamp
 
             send_hum = (
                 last_hum is None or
@@ -131,11 +142,9 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
                 last_hum = humidity_percent
                 last_hum_time = now
                 async with lock:
-                    # Publish just the number as string
                     await mqtt.publish(topic_hum, str(humidity_percent))
                     logger.info(f"Published soil humidity: {humidity_percent}%")
 
-                    # Also publish combined JSON to main soil topic with timestamp
                     payload = {
                         "humidity": humidity_percent,
                         "timestamp": now
@@ -146,7 +155,7 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
         except Exception as e:
             logger.error(f"Error reading soil humidity sensor: {e}")
 
-        await asyncio.sleep_ms(5000)
+        await asyncio.sleep_ms(sleep_ms)
 
 
 async def disconnection_worker(logger: Logger, mqtt: MQTTClient):

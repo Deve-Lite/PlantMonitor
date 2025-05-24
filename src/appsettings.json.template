@@ -4,7 +4,7 @@
         "version": "dht22",
         "topic": "dht",
         "temperature": {
-            "min_interval": 10000,
+            "min_interval": 20000,
             "threshold": 0.2,
             "topic": "temperature"
         },
