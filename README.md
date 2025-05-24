@@ -30,6 +30,10 @@
 
 This project aims to develop a device using Raspberry Pi Pico that can monitor plants. The device will be equipped with sensors for air humidity, temperature, plant moisture, and light intensity. It will have a modular design, allowing multiple humidity sensors for plants or photoresistors to be connected. The entire system will be based on the MQTT protocol, enabling it to share information with other devices. Additionally, the device will feature a button for turning it on/off. The system is designed to be highly modular, allowing easy addition of new sensors with appropriate drivers. The device itself will not have physical labels, but the modular system will enable this, with the only limitation being the number of pins available. The software will be written in Python.
 
+Versoions:
+- V1 - working - branch `plantmonitor/v1`
+- V2 - working - branch `main` - no docs
+
 #### Main Features
 - Monitoring of air humidity, temperature, plant moisture, and light intensity.
 - Modular design for easy attachment of multiple sensors.
