@@ -1,6 +1,7 @@
 import asyncio
 import dht
 import time
+import json
 import sys
 from logger.logger import Logger
 from mqtt_as import MQTTClient
@@ -82,7 +83,7 @@ async def dht_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Lock, configu
                         "humidity": humidity,
                         "timestamp": now
                     }
-                    await mqtt.publish(topic_dht, str(payload))
+                    await mqtt.publish(topic_dht, json.dumps(payload))
                     logger.info("Published combined dht: {}".format(payload))
 
         except Exception as e:
@@ -149,7 +150,7 @@ async def soil_humidity_loop(logger: Logger, mqtt: MQTTClient, lock: asyncio.Loc
                         "humidity": humidity_percent,
                         "timestamp": now
                     }
-                    await mqtt.publish(topic_soil, str(payload))
+                    await mqtt.publish(topic_soil, json.dumps(payload))
                     logger.info(f"Published combined soil humidity data: {payload}")
 
         except Exception as e:
@@ -187,6 +188,17 @@ class App:
         self._lock = asyncio.Lock()
 
     async def start(self):
+        
+        last_will_topic = f"{self._configuration["mqtt"]["baseTopic"]}/{self._configuration["mqtt"]["will"]["topic"]}"
+        
+        payload = {
+            "online": True
+        }
+        
+        last_will_message = json.dumps(payload)
+        
+        self._logger.info(f"Sending working message: {last_will_topic} -> {last_will_message}")
+        await self._mqtt.publish(last_will_topic.encode('utf-8'), last_will_message.encode('utf-8'), retain=True)
         
         self._logger.debug(f"Starting dht loop.")
         message = asyncio.create_task(dht_loop(self._logger, self._mqtt, self._lock, self._configuration))

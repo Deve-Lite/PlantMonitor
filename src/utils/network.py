@@ -1,3 +1,4 @@
+import json
 from logger.logger import Logger
 from mqtt_as import config, MQTTClient
 
@@ -26,5 +27,14 @@ def setup_network(configuration: dict, logger: Logger):
 
     if logger.is_debug:
         MQTTClient.DEBUG = True
+    
+    last_will_topic = f"{configuration["mqtt"]["baseTopic"]}/{configuration["mqtt"]["will"]["topic"]}"
+    
+    payload = {
+        "online": False
+    }
+    last_will_message = json.dumps(payload)
+    
+    config["last_will"] = [last_will_topic, last_will_message, True, 0]
 
     return MQTTClient(config)
